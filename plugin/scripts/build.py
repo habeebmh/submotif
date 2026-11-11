@@ -215,7 +215,7 @@ def main():
                     'sourceFiles': before,
                     'tests': 'skipped' if args.skip_tests else 'passed', 'coreOnly': args.core_only,
                     'signing': 'unsigned' if system == 'Windows' else 'ad-hoc development',
-                    'binaries': {str(p.relative_to(plan['directory'])): sha(p) for p in products[2]} if products else {},
+                    'binaries': {p.relative_to(plan['directory']).as_posix(): sha(p) for p in products[2]} if products else {},
                     'releasePublished': False}
         pending_manifest = plan['directory'] / '.BUILD.json.tmp'
         pending_manifest.write_text(json.dumps(manifest, indent=2) + '\n')
