@@ -28,31 +28,10 @@ strong,b{font-weight:500}
 .midi-output{display:flex;align-items:center;gap:16px;margin-top:16px;font-size:20px}
 .midi-output small{display:block;color:var(--muted);font:400 14px/1.5 var(--font-text);margin-top:4px}
 .file-extension{font:400 14px/1 var(--font-mono);border:1px solid var(--line-strong);border-radius:8px;padding:16px 8px;color:var(--accent)}
-/* The product is a single fluid window. The page and the app share button and type tokens. */
-.generator{display:flex;flex-direction:column;flex:1;min-height:420px;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:var(--bg);overflow:hidden;color:var(--ink)}
-.generator__bar{display:flex;align-items:center;gap:24px;padding:20px 24px;border-bottom:1px solid var(--line);flex:none}
-.generator__brand{font:500 20px/1.2 var(--font-display);letter-spacing:-.03em}
-.generator__meta,.generator__status{font-size:13px;color:var(--muted)}
-.generator__status{margin-left:auto}
-.generator__body{display:grid;grid-template-columns:192px minmax(0,1fr);min-height:0;flex:1}
-.style-list{display:grid;align-content:start;gap:4px;padding:16px;border-right:1px solid var(--line)}
-.style-list button,.recording-choices button{min-height:48px;border:0;border-radius:var(--r-sm);padding:12px 16px;text-align:left;font:400 16px/1.25 var(--font-text);color:var(--muted);background:transparent;cursor:pointer}
-.style-list button:hover,.recording-choices button:hover{background:var(--surface);color:var(--ink)}
-.style-list button[aria-pressed=true],.recording-choices button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
-.style-list button:focus-visible,.recording-choices button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.generator__editor{min-width:0;display:flex;flex-direction:column;padding:24px;gap:16px}
-.roll-heading,.beat-labels{display:flex;justify-content:space-between;font-size:14px}
-.roll-heading>span:last-child{color:var(--muted)}
-.beat-labels{font:400 13px/1 var(--font-mono);color:var(--muted)}
-.beat-labels span{flex:1}
-.piano-roll{position:relative;flex:1;min-height:128px;border:1px solid var(--line);border-radius:4px;background:repeating-linear-gradient(to right,transparent 0 calc(6.25% - 1px),#303a31 calc(6.25% - 1px) 6.25%),repeating-linear-gradient(to bottom,#141b16 0 19px,#1a231c 19px 38px);overflow:hidden}
-.note{position:absolute;height:10px;min-width:2px;background:var(--accent);border-radius:2px}
-.playhead{position:absolute;inset:0 auto 0 0;width:2px;background:var(--ink);pointer-events:none}
-.generator__description{font-size:14px;line-height:1.5;color:var(--muted);min-height:21px}
-.generator__controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;flex:none}
-.generator__controls>.btn{font-size:16px;padding-inline:20px;white-space:nowrap}
-.generator__controls>#export-midi{margin-left:auto}
-.generator__foot{border-top:1px solid var(--line);padding:12px 24px;font-size:13px;color:var(--muted);flex:none}
+.recording-choices button{min-height:48px;border:0;border-radius:var(--r-sm);padding:12px 16px;text-align:left;font:400 16px/1.25 var(--font-text);color:var(--muted);background:transparent;cursor:pointer}
+.recording-choices button:hover{background:var(--surface);color:var(--ink)}
+.recording-choices button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.recording-choices button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 /* Six approved recordings use one player, so phone controls never form an oversized card stack. */
 .showcase-list{display:flex;flex:1;min-height:0}
 .recording-window{display:grid;grid-template-columns:224px minmax(0,1fr);width:100%;min-height:420px;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
@@ -94,22 +73,6 @@ strong,b{font-weight:500}
  .hero__text .btn-row>.btn--secondary{display:none}
  .hero__media>.product-shot{inset:50% 16px auto;width:calc(100% - 32px);height:auto;transform:translateY(-50%)}
  .hero__media .ly-float{display:none}
- .generator{min-height:0;flex:none}
- .generator__bar{padding:12px;gap:12px}
- .generator__brand{font-size:16px}
- .generator__meta{font-size:13px;margin-left:auto}
- .generator__status{display:none}
- .generator__body{display:flex;flex-direction:column}
- .style-list{grid-template-columns:repeat(3,minmax(0,1fr));border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:4px}
- .style-list button{min-height:44px;padding:8px 4px;text-align:center;font-size:14px}
- .generator__editor{padding:16px;gap:12px}
- .piano-roll{flex:none;height:120px;min-height:0}
- .generator__description{font-size:13px;min-height:40px}
- .generator__controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .generator__controls>#generate{grid-column:1/-1}
- .generator__controls>#export-midi{margin-left:0}
- .generator__controls>.btn{font-size:16px;padding-inline:10px;flex:1}
- .generator__foot{font-size:13px;padding:12px 16px}
  .recording-window{display:flex;flex-direction:column;min-height:0}
  .recording-choices{grid-template-columns:repeat(3,minmax(0,1fr));padding:12px;gap:4px;border-right:0;border-bottom:1px solid var(--line)}
  .recording-choices button{font-size:14px;text-align:center;padding:8px 4px;min-height:44px}
@@ -131,13 +94,8 @@ strong,b{font-weight:500}
 @media(max-height:740px) and (max-width:1023px){
  .hero__text>.hero-facts{display:none}
  .hero__media{min-height:160px}
- .generator__editor{gap:8px;padding:12px}
- .generator__description{display:none}
- .piano-roll{height:96px;min-height:96px;flex:none}
- .generator__foot{padding-block:8px}
 }
 
-@media(prefers-reduced-motion:reduce){.playhead{display:none}}
 
 .hero__text .btn-row>.link{display:inline-flex;align-items:center;min-height:44px}
 .recording-head .recording-title{color:var(--ink);margin-top:0}

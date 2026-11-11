@@ -1,4 +1,4 @@
-/* The preview uses the actual portable engine; no saved pattern bank. */
+/* Approved bassline recordings and their exact MIDI downloads. */
 (() => {
  'use strict';
  const config=window.UNDERTOW_SITE||{};
@@ -11,44 +11,13 @@
  if(config.releaseReady&&release){document.querySelectorAll('[data-download],[data-download-final]').forEach(a=>a.href=release);document.querySelector('#release-status').textContent='Free download · Apple Silicon · macOS 11+'}
  else{const final=document.querySelector('[data-download-final]');final.setAttribute('aria-disabled','true');final.removeAttribute('href');final.setAttribute('tabindex','0');final.setAttribute('title','The first public release is not available yet.');final.addEventListener('click',e=>e.preventDefault())}
  const names=['Deep House','Rolling','Offbeat','Acid','Disco','Funk'];
- const descriptions=['A spacious motif with sustained notes and restrained movement.','A repeating motif, grounded in the root, with small rhythmic changes.','Bass notes between the main beats, leaving space for the kick.','Short phrases with accents and occasional close passing notes.','Octave motion and chord tones shape a more melodic line.','Syncopation, rests and answering phrases make room around the beat.'];
- const C=window.UndertowCore;if(!C){document.querySelector('#generator-message').textContent='The generator could not load. Reload the page to try again.';return}
- let settings=C.defaults(),pattern,playing=false,pendingStart=false,playbackGeneration=0,audio,master,timer,frame,startAt,nodes=[];settings.style=1;
+ // The shared core validates the approved MIDI patterns; generation happens in the plugin.
+ const C=window.UndertowCore;if(!C)return;
  const featured=new Map(),showcasePlayers=[];
  for(const item of config.featured||[]){if(item.approved!==true||!names.includes(item.style)||!C.valid(item.pattern)||!/^([a-z]+)-[0-9]{2}$/.test(item.id||'')||typeof item.audio!=='string'||!item.audio.trim())continue;try{const url=new URL(item.audio,document.baseURI);if(url.origin!==location.origin||!/^https?:$/.test(url.protocol))continue;if(featured.has(names.indexOf(item.style)))throw new Error('duplicate style');featured.set(names.indexOf(item.style),{...item,audio:url.href})}catch{}}
  function stopShowcase(){showcasePlayers.forEach(player=>player.pause())}
- const roll=document.querySelector('#roll-notes'), play=document.querySelector('#preview-play'), head=document.querySelector('.playhead'), message=document.querySelector('#generator-message');
- function seed(){const b=new Uint32Array(1);if(globalThis.crypto?.getRandomValues){crypto.getRandomValues(b);return b[0]||1}return (Date.now()^Math.floor(Math.random()*0xffffffff))>>>0}
- function draw(){
-  roll.replaceChildren();const low=Math.min(34,...pattern.notes.map(n=>n.pitch))-1,high=Math.max(46,...pattern.notes.map(n=>n.pitch))+1;
-  for(const n of pattern.notes){const el=document.createElement('span');el.className='note';el.style.left=`${n.start/pattern.lengthBeats*100}%`;el.style.width=`${Math.max(.3,n.duration/pattern.lengthBeats*100)}%`;el.style.top=`${12+(high-n.pitch)/(high-low)*76}%`;el.title=`MIDI note ${n.pitch}, beat ${(n.start+1).toFixed(2)}`;roll.append(el)}
-  document.querySelector('#pattern-label').textContent=names[settings.style];document.querySelector('#note-count').textContent=`${pattern.notes.length} notes`;document.querySelector('#style-description').textContent=descriptions[settings.style];document.querySelector('.generator__meta').textContent=`C minor / ${pattern.lengthBeats/4} ${pattern.lengthBeats===4?'bar':'bars'} / 126 BPM`;document.querySelector('.generator__status').textContent='Browser preview';document.querySelector('#piano-roll').setAttribute('aria-label',`${names[settings.style]} bassline in C minor with ${pattern.notes.length} MIDI notes`)
- }
- function stop(){playbackGeneration++;pendingStart=false;playing=false;clearTimeout(timer);cancelAnimationFrame(frame);nodes.forEach(n=>{try{n.stop()}catch{}});nodes=[];play.textContent='Play';play.setAttribute('aria-label','Play preview');play.removeAttribute('aria-busy');play.setAttribute('aria-pressed','false');head.hidden=true}
- function generate(){stopShowcase();stop();pattern=C.generate(settings,seed(),null,false);if(!C.valid(pattern))throw new Error('Invalid generator output');draw();message.textContent=`Generated ${names[settings.style]} with ${pattern.notes.length} notes.`}
- function note(n,at){
-  const duration=n.duration*60/126,osc=audio.createOscillator(),sub=audio.createOscillator(),gain=audio.createGain(),filter=audio.createBiquadFilter();
-  const hz=440*2**((n.pitch-69)/12),peak=.16*n.velocity/127,sustain=.07*n.velocity/127,attack=Math.min(.008,duration*.2),decay=Math.min(.09,duration*.65),releaseAt=at+duration;
-  osc.type='sawtooth';osc.frequency.value=hz;sub.type='sine';sub.frequency.value=hz;filter.type='lowpass';filter.frequency.setValueAtTime(2000,at);filter.frequency.exponentialRampToValueAtTime(230,at+Math.min(.11,duration*.8));filter.Q.value=.9;
-  gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(peak,at+attack);gain.gain.exponentialRampToValueAtTime(sustain,at+decay);gain.gain.setValueAtTime(sustain,releaseAt);gain.gain.exponentialRampToValueAtTime(.0001,releaseAt+.035);
-  osc.connect(filter);sub.connect(filter);filter.connect(gain);gain.connect(master);osc.start(at);sub.start(at);osc.stop(releaseAt+.045);sub.stop(releaseAt+.045);nodes.push(osc,sub);osc.onended=()=>{osc.disconnect();sub.disconnect();filter.disconnect();gain.disconnect()}
- }
- async function preview(){
-  if(playing||pendingStart){stop();return}
-  stopShowcase();const token=++playbackGeneration;pendingStart=true;play.textContent='Starting…';play.setAttribute('aria-busy','true');
-  try{
-   audio||=(new (window.AudioContext||window.webkitAudioContext)());if(!master){master=audio.createGain();master.gain.value=.65;master.connect(audio.destination)}
-   await audio.resume();
-   if(token!==playbackGeneration||document.hidden){if(token===playbackGeneration)stop();return}
-   pendingStart=false;playing=true;play.removeAttribute('aria-busy');play.textContent='Stop';play.setAttribute('aria-label','Stop preview');play.setAttribute('aria-pressed','true');startAt=audio.currentTime+.04;const bar=pattern.lengthBeats*60/126;
-   for(let repeat=0;repeat<4;repeat++)pattern.notes.forEach(n=>note(n,startAt+repeat*bar+n.start*60/126));head.hidden=false;
-   const tick=()=>{if(!playing)return;const progress=Math.max(0,audio.currentTime-startAt)%bar/bar;head.style.left=`${progress*100}%`;frame=requestAnimationFrame(tick)};tick();timer=setTimeout(stop,(bar*4+.2)*1000)
-  }catch(e){if(token!==playbackGeneration)return;stop();message.textContent='Audio could not start. Try Play preview again.'}
- }
- document.querySelectorAll('[data-style]').forEach(button=>button.addEventListener('click',()=>{settings.style=Number(button.dataset.style);document.querySelectorAll('[data-style]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));generate()}));
- document.querySelector('#generate').addEventListener('click',generate);play.addEventListener('click',preview);
- document.querySelector('#export-midi').addEventListener('click',()=>{const bytes=new Uint8Array(C.midiFile(pattern));const url=URL.createObjectURL(new Blob([bytes],{type:'audio/midi'}));const a=document.createElement('a');a.href=url;a.download=`Submotif-${names[settings.style].toLowerCase().replaceAll(' ','-')}-C-minor-${pattern.seed}.mid`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);message.textContent='MIDI file saved. Drag it into an instrument track in your DAW.'});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();stopShowcase()}});window.addEventListener('pagehide',()=>{stop();stopShowcase()});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stopShowcase()});
+ window.addEventListener('pagehide',stopShowcase);
  function showcaseRoll(pattern,style){
   const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 320 64');svg.classList.add('showcase-roll');svg.setAttribute('role','img');svg.setAttribute('aria-label',`${style}: ${pattern.notes.length} exact selected MIDI notes`);
   const add=(tag,attrs)=>{const el=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));svg.append(el)};
@@ -99,9 +68,9 @@
    choices.querySelectorAll('button').forEach((button,index)=>button.setAttribute('aria-pressed',String(index===style)));
   }
   for(let style=0;style<6;style++){const button=document.createElement('button');button.type='button';button.textContent=names[style];button.addEventListener('click',()=>selectRecording(style));choices.append(button)}
-  player.addEventListener('play',()=>{stop();if(document.hidden)player.pause()});showcasePlayers.push(player);
+  player.addEventListener('play',()=>{if(document.hidden)player.pause()});showcasePlayers.push(player);
   detail.append(heading,player,download);windowEl.append(choices,detail);list.append(windowEl);selectRecording(0);
   document.querySelector('#showcase').hidden=false;
  }
- buildShowcase();generate();
+ buildShowcase();
 })();

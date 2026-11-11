@@ -1,6 +1,6 @@
 # Submotif landing page
 
-A dependency-free static page, with original product UI and a browser preview driven by the exact portable Submotif engine. All CSS, JavaScript, fonts, and artwork are hosted locally. No analytics, cookies, or third-party embedded players are used.
+A dependency-free static page, with the native product UI and six owner-approved bassline recordings with matching MIDI downloads. All CSS, JavaScript, fonts, and artwork are hosted locally. No analytics, cookies, or third-party embedded players are used.
 
 ## Preview
 
@@ -10,7 +10,7 @@ Serve the `web/` folder over HTTP. For example, from the project root:
 python3 -m http.server 8080 --directory web
 ```
 
-Open `http://localhost:8080`. ES modules require an HTTP server; double-clicking the file will not provide the complete interactive preview.
+Open `http://localhost:8080`. ES modules require an HTTP server; double-clicking the file will not provide the complete recording showcase.
 
 ## Publication settings
 
@@ -28,9 +28,9 @@ Edit `assets/site-config.js`:
 - `instagram`: the owner's confirmed HTTPS profile URL. The owner supplied the current profile. Blank means Instagram links and support copy stay hidden.
 - `canonical`: actual assigned Firebase `web.app` origin initially, or the confirmed custom domain when attached; also set canonical and absolute social-image metadata in `index.html` before publication.
 - `licenseStatus`: `AGPL-3.0-only`, explicitly selected by the owner. The project is free and open source; AGPLv3 permits forks and commercial distribution subject to its terms. The page does not claim that resale or derivatives are prohibited.
-- `featured`: six explicitly approved showcase selections: `{style, audio, id, approved:true, pattern}`. The UI validates each MIDI pattern, requires same-origin audio, and shows a separate showcase only with all six unique styles explicitly approved. `showcaseBatchFingerprint` must match the exact 64-character SHA-256 preview-batch fingerprint in the owner-approved selection export and manifest. Each ID and style must match `showcaseManifest` (default `review/manifest.json`); the complete pattern must match exactly, or have a recorded owner-approved octave transformation that changes only pitches. The transformation must link the original source MIDI hash, and its rendered/exported native MIDI hash must agree. The current Acid example is explicitly approved at +24 semitones; the manifest must identify the C natural minor, two-bar, 126 BPM review batch. `showcaseApprovalManifest` (default `assets/audio/approved-manifest.json`) separately approves each final recording path and links its source MIDI hash to the original candidate. Authorized Serum renders must name the chosen preset and have approved status; no neutral acid recording is substituted while that render is pending. The owner-approved config is separate from the original candidate data. Each recording has an export of its exact pattern. Showcase playback pauses the live preview and other recordings; live playback pauses the showcase. Generate always runs the algorithm anew.
+- `featured`: six explicitly approved showcase selections: `{style, audio, id, approved:true, pattern}`. The UI validates each MIDI pattern, requires same-origin audio, and shows a separate showcase only with all six unique styles explicitly approved. `showcaseBatchFingerprint` must match the exact 64-character SHA-256 preview-batch fingerprint in the owner-approved selection export and manifest. Each ID and style must match `showcaseManifest` (default `review/manifest.json`); the complete pattern must match exactly, or have a recorded owner-approved octave transformation that changes only pitches. The transformation must link the original source MIDI hash, and its rendered/exported native MIDI hash must agree. The current Acid example is explicitly approved at +24 semitones; the manifest must identify the C natural minor, two-bar, 126 BPM review batch. `showcaseApprovalManifest` (default `assets/audio/approved-manifest.json`) separately approves each final recording path and links its source MIDI hash to the original candidate. Authorized Serum renders must name the chosen preset and have approved status; no neutral acid recording is substituted while that render is pending. The owner-approved config is separate from the original candidate data. Each recording has an export of its exact pattern. Selecting a different style pauses the previous recording before loading the selected example.
 
-The live preview's synth is specific to the webpage; Submotif itself remains MIDI-only. Preview volume is limited and audio begins only after a deliberate Play click. Playback stops after four repeats, on another generation, on tab hiding, or on page exit.
+Recordings play only after a deliberate Play click and pause on tab hiding or page exit. The redundant browser generator section has been removed at the owner’s request; navigation and primary buttons lead to the six examples. The shared core remains loaded to validate approved MIDI patterns, and does not generate patterns or synthesize audio on the landing page.
 
 ## Audition approval
 
@@ -51,6 +51,6 @@ Design decisions, recorded deals, facts and the finish-gate report are under `.t
 
 The earlier page shipped with an incomplete finish gate, accumulated mobile overrides, a decorative overlay, and insufficient checks of short phone viewports and live motion. This was an implementation and verification failure. The archived baseline under `.taste-skill/previous-build/` and short-screen report reproduce the excessive section heights.
 
-The replacement uses the native editor as the hero image, one live generator window, one player with six explicit recording choices, and two plain Ableton routing diagrams. The extra repository/FAQ screen was removed; contribution and Instagram support links are in the footer. It keeps normal document scrolling and uses the upstream hero entrance, hover layer, and word-highlight moment. Reduced-motion behavior comes from the same upstream runtime. There is no timed recording rotation or autoplay. Approved MIDI, audio, provenance and the portable generation engine remain unchanged.
+The page uses the native editor as the hero image, one player with six explicit recording choices, and two plain Ableton routing diagrams. The extra repository/FAQ screen was removed; contribution and Instagram support links are in the footer. It keeps normal document scrolling and uses the upstream hero entrance, hover layer, and word-highlight moment. Reduced-motion behavior comes from the same upstream runtime. There is no timed recording rotation or autoplay. Approved MIDI, audio, provenance and the portable generation engine remain unchanged.
 
 The redesign is a new requested build, with the previous failed gate retained separately. Current validation and viewport evidence are recorded under `web/.taste-skill/` and `web/shots/`, excluded from hosting.
