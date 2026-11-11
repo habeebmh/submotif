@@ -8,7 +8,7 @@
 <meta property="og:type" content="website"><meta property="og:title" content="Submotif — MIDI basslines for house music"><meta property="og:description" content="Six house styles. Fresh MIDI for your own synth. Free and open source."><meta property="og:image" content="https://submotif.web.app/share.jpg"><meta property="og:url" content="https://submotif.web.app/"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#101512">
 <link rel="icon" href="favicon.svg"><link rel="canonical" href="https://submotif.web.app/">
 <link rel="preload" href="assets/fonts/familjen-grotesk.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="assets/system.css"><link rel="stylesheet" href="assets/ui/cards.css"><link rel="stylesheet" href="assets/motion/motion.css"><link rel="stylesheet" href="assets/layout/layout.css"><link rel="stylesheet" href="assets/site.css?v=1.2.2-downloads">
+<link rel="stylesheet" href="assets/system.css"><link rel="stylesheet" href="assets/ui/cards.css"><link rel="stylesheet" href="assets/motion/motion.css"><link rel="stylesheet" href="assets/layout/layout.css"><link rel="stylesheet" href="assets/site.css?v=20261111-contribute">
 <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
 <script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
 <link rel="modulepreload" href="assets/moments/moments.js"><link rel="modulepreload" href="assets/moments/lib.js"><link rel="modulepreload" href="assets/moments/word-highlight/moment.js">
@@ -19,7 +19,7 @@
 <header class="nav nav--centre"><div class="wrap nav__bar">
 <a class="skip-link" href="#top">Skip to content</a>
 <a class="nav__logo" href="#top" aria-label="Submotif home"><svg class="brand-wave" viewBox="0 0 32 32" aria-hidden="true"><path d="M1 18h6l4-12 6 21 5-15 4 6h5"/></svg>Submotif</a>
-<nav class="nav__links" aria-label="Main"><div class="nav__item"><a class="nav__link" href="#showcase">Basslines</a></div><div class="nav__item"><a class="nav__link" href="#workflow">Setup</a></div><div class="nav__item"><a class="nav__link" href="#download">Download</a></div></nav>
+<nav class="nav__links" aria-label="Main"><div class="nav__item"><a class="nav__link" href="#showcase">Basslines</a></div><div class="nav__item"><a class="nav__link" href="#workflow">Setup</a></div><div class="nav__item"><a class="nav__link" href="#contribute">Contribute</a></div></nav>
 <div class="nav__actions"><a class="btn btn--primary" href="#download">Download Submotif</a></div>
 <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6"/></svg></button>
 </div></header>
@@ -36,10 +36,21 @@
 <a class="btn btn--primary setup-link" href="https://github.com/habeebmh/submotif#start-in-ableton" data-repo-path="#start-in-ableton">Read the setup guide</a>
 </div></section>
 
+<section class="section contribute-section" id="contribute" aria-labelledby="contribute-h"><div class="wrap">
+<div class="section-head"><h2 id="contribute-h">Help shape Submotif.</h2><p>Submotif is open-source software under <a href="legal/license.html">AGPLv3</a>. You can study, modify and redistribute the code under its terms. Official downloads are free, and you don’t need to code to contribute.</p></div>
+<div class="grid contribution-paths">
+<article class="span-6"><h3>Musical feedback</h3><p>Share an original MIDI example, the style and settings, and what you would change about its groove or melody.</p><a class="link" href="https://github.com/habeebmh/submotif/issues/new?template=feature_request.yml">Share musical feedback</a></article>
+<article class="span-6"><h3>DAW testing</h3><p>Try playback, MIDI export and session recall in your DAW. Report your exact setup and steps to reproduce a problem.</p><a class="link" href="https://github.com/habeebmh/submotif/issues/new?template=bug_report.yml">Report a bug</a></article>
+<article class="span-6"><h3>Code &amp; design</h3><p>Improve the generation rules, accessibility or interface. Discuss larger changes in an issue before opening a focused pull request.</p><a class="link" href="https://github.com/habeebmh/submotif/issues">Browse open issues</a></article>
+<article class="span-6"><h3>Documentation</h3><p>Clarify setup instructions, document a host workflow or help translate a guide. Small corrections are welcome.</p><a class="link" href="https://github.com/habeebmh/submotif/blob/main/docs/CONTRIBUTING.md#documentation-design-and-accessibility">Improve the docs</a></article>
+</div>
+<div class="contribute-next"><a class="btn btn--primary" href="https://github.com/habeebmh/submotif/blob/main/docs/CONTRIBUTING.md">Read the contribution guide</a><p>Fork the repo, make a focused change, then open a pull request. Community PRs need Habeeb’s approval before merging.</p></div>
+</div></section>
+
 </main>
 <footer class="footer closing footer-columns" id="download" aria-labelledby="close-h"><div class="wrap">
 <div class="closing__cta close--word"><div class="section-head section-head--split"><div><h2 id="close-h">Submotif downloads.</h2><p id="release-status">Free · macOS 11+ · Apple Silicon + Intel.</p></div><a class="btn btn--primary" href="https://github.com/habeebmh/submotif/releases/latest" data-download-final>View latest release</a></div><div class="download-options" aria-label="Download for your computer"><a class="link" href="https://github.com/habeebmh/submotif/releases/latest/download/Submotif-macos-universal.zip">Download for Mac</a><a class="link" href="https://github.com/habeebmh/submotif/releases/latest">Windows &amp; other builds</a></div><p class="release-note">The Mac download includes VST3 + Max for Live and is not notarized. See the latest release for Windows availability. <a class="link" href="https://github.com/habeebmh/submotif/blob/main/docs/INSTALL.md">Installation guide</a></p><div class="close__word" aria-hidden="true">Submotif</div></div>
-<div class="closing__links"><div class="grid"><div class="span-3 footer__col"><h3>Project</h3><a href="https://github.com/habeebmh/submotif" data-repo>Contribute on GitHub</a><a href="https://github.com/habeebmh/submotif/blob/main/docs/CONTRIBUTING.md" data-repo-path="/blob/main/docs/CONTRIBUTING.md">Contributing</a><a data-instagram aria-label="Follow Habeeb on Instagram to support this free project" href="https://www.instagram.com/habeeeeeeeeeeeeeeeb/">Follow to support</a></div><div class="span-3 footer__col"><h3>Resources</h3><a href="#showcase">Basslines</a><a href="#workflow">Setup</a><a href="legal/license.html">AGPLv3 license</a></div></div><div class="footer__legal"><span>© 2026 Habeeb</span><div class="legal-links"><a href="legal/terms.html">Terms of use</a><a href="legal/liability.html">Liability release</a><a href="legal/privacy.html">Privacy</a><a href="credits.html">Credits</a></div></div></div>
+<div class="closing__links"><div class="grid"><div class="span-3 footer__col"><h3>Project</h3><a href="https://github.com/habeebmh/submotif" data-repo>Source on GitHub</a><a href="#contribute">Ways to contribute</a><a data-instagram aria-label="Follow Habeeb on Instagram to support this free project" href="https://www.instagram.com/habeeeeeeeeeeeeeeeb/">Follow to support</a></div><div class="span-3 footer__col"><h3>Resources</h3><a href="#showcase">Basslines</a><a href="#workflow">Setup</a><a href="legal/license.html">AGPLv3 license</a></div></div><div class="footer__legal"><span>© 2026 Habeeb</span><div class="legal-links"><a href="legal/terms.html">Terms of use</a><a href="legal/liability.html">Liability release</a><a href="legal/privacy.html">Privacy</a><a href="credits.html">Credits</a></div></div></div>
 </div></footer>
 <script type="module" src="assets/system.js"></script><script type="module" src="assets/layout/layout.js"></script><script type="module" src="assets/motion/motion.js"></script>
 </body></html>

@@ -112,7 +112,14 @@ The parity check uses Clang by default; pass `--compiler g++` to use GCC. See [C
 
 ## Help shape SUBMOTIF
 
-Musicians, developers, designers, and careful listeners are welcome. Report a reproducible problem, improve instructions, test a host, or propose a focused change. Small contributions are valuable. Start with [the contribution guide](docs/CONTRIBUTING.md) and [open issues](https://github.com/habeebmh/submotif/issues).
+Submotif is open-source software under AGPLv3: you can study, modify and share the code under its terms. Official downloads are free. You do not need to code, pay or follow anyone to get involved.
+
+- **Musicians:** share an original MIDI example, the settings and what you would change about the groove or melody. [Send musical feedback](https://github.com/habeebmh/submotif/issues/new?template=feature_request.yml).
+- **Testers:** check playback, MIDI export and session recall in your DAW. Include your exact setup and reproduction steps in a [bug report](https://github.com/habeebmh/submotif/issues/new?template=bug_report.yml).
+- **Developers and designers:** fix a focused issue, improve accessibility or propose a clearer interface. Discuss larger changes before implementation and keep the native and Max engines in agreement.
+- **Writers and translators:** correct instructions, document a tested host workflow or propose a translated guide. Small documentation fixes are welcome.
+
+Start with [existing issues](https://github.com/habeebmh/submotif/issues) and the [contribution guide](docs/CONTRIBUTING.md). It covers first pull requests, musical evidence, DAW testing, relevant checks and licensing. Fork the repository, make a focused change and open a PR against `main`; community PRs require **@habeebmh's approval** before merging. Contributors retain their copyright and contribute under the same AGPLv3-only license.
 
 If SUBMOTIF helps you make something, an optional [follow on Instagram](https://www.instagram.com/habeeeeeeeeeeeeeeeb/) is a welcome thank-you. Sharing feedback or contributing to the project is welcome too.
 

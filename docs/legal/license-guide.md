@@ -1,6 +1,6 @@
 # AGPLv3 license
 
-Last updated: November 11, 2026. Release packaging and downloads remain on hold pending review. The software license has been selected.
+Last updated: November 11, 2026. This guide describes the project’s AGPLv3-only license and contribution terms.
 
 ## Copyright and applicability
 
@@ -14,7 +14,7 @@ Read the [complete AGPLv3 license supplied with SUBMOTIF](../../LICENSE). That f
 
 You may use, study, modify, fork, redistribute, and sell copies of the software under the AGPL's conditions. Those conditions include preserving required notices and providing Corresponding Source when required. Distributed modified versions must remain under the applicable AGPL terms. Section 13 also addresses source access for users interacting remotely with a modified version over a network.
 
-Official SUBMOTIF releases will be free to download. Following the creator, paying, donating, or contributing is optional and is never required for access. This official-download policy does not prohibit others from charging for copies or services under the AGPL. Availability of future hosting, updates, and support is not guaranteed.
+Official SUBMOTIF releases are free to download. Following the creator, paying, donating, or contributing is optional and is never required for access. This official-download policy does not prohibit others from charging for copies or services under the AGPL. Availability of future hosting, updates, and support is not guaranteed.
 
 ## Dependencies
 
