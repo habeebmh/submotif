@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "sourceBatchFingerprint": "e9ed6426621b0aa0ac331289525153c9da8b5784aaab23f3d85977a704750e5c",
+  "recordedAtUtc": "2026-11-11T06:26:59.837530+00:00",
+  "choices": {
+    "deep": "deep-01",
+    "rolling": "rolling-06",
+    "offbeat": "offbeat-01",
+    "acid": "acid-03",
+    "disco": "disco-01",
+    "funk": "funk-02"
+  },
+  "midiApproved": [
+    "deep-01",
+    "rolling-06",
+    "offbeat-01",
+    "acid-03-plus24",
+    "disco-01",
+    "funk-02"
+  ],
+  "originalPreviewAudioApproved": [
+    "deep-01",
+    "rolling-06",
+    "offbeat-01",
+    "disco-01",
+    "funk-02"
+  ],
+  "pendingAudio": {},
+  "approvedAssetsManifest": "../site/assets/audio/approved-manifest.json",
+  "approvalBasis": "Explicit user choices supplied in conversation. The copied choices preceded the metadata-only fingerprint migration; all original candidate data and 384 audio/MIDI asset hashes were verified unchanged.",
+  "originalRenderSources": {
+    "Source/PatternEngine.cpp": "1a9da4d0b35231749f316e75ea7a1f95fe5e9cfcc15c4162613e335fe9db6f41",
+    "Source/PatternEngine.h": "037730c0f9e432c3fa025f90fc779fd525b8a8307ed041607f0150a7c29eab31",
+    "max/undertow-core.js": "646111bc916df4e1ffb6a0976ed999a891294bbb36a19dcc11e8d25edfe00807",
+    "scripts/render_showcase.py": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+  },
+  "currentShowcaseSelections": {
+    "deep": "deep-01",
+    "rolling": "rolling-06",
+    "offbeat": "offbeat-01",
+    "acid": "acid-03-plus24",
+    "disco": "disco-01",
+    "funk": "funk-02"
+  },
+  "serumPreviewAudioApproved": [
+    "acid-03-plus24"
+  ],
+  "acidOctaveApproval": {
+    "recordedAtUtc": "2026-11-11T06:50:17.431238+00:00",
+    "basis": "User explicitly selected \u201cTwo octaves higher\u201d for the website after hearing the Serum alternatives.",
+    "sourceCandidateId": "acid-03",
+    "chosenVariantId": "acid-03-plus24",
+    "transposeSemitones": 24,
+    "sourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce",
+    "approvedMidiSha256": "275e6171bbfeeb39c9c88faeeab1eb80950a178e510799423f19c48195ba6a66",
+    "preset": "TSP_S290V3_Bass_acid_sweep.SerumPreset",
+    "provenance": "../site/assets/audio/acid-03-serum-plus24-provenance.json"
+  }
+}

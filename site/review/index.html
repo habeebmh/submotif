@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f5f5f0">
+  <meta name="description" content="Listen to ten freshly generated SUBMOTIF basslines in each style and choose six examples for review.">
+  <title>Choose the basslines · SUBMOTIF by Habeeb</title>
+  <link rel="stylesheet" href="review.css">
+  <script src="candidates.js" defer></script>
+  <script src="review.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#candidates">Skip to basslines</a>
+  <header class="masthead">
+    <a class="wordmark" href="../index.html">SUBMOTIF <span>by Habeeb</span></a>
+    <span class="review-label">Listening room</span>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">60 fresh ideas. Six final picks.</p>
+      <h1 id="page-title">Choose the basslines.</h1>
+      <p class="lead">Listen to ten examples of each style. Choose one per style, then copy your picks for approval.</p>
+      <p class="details">C minor · C1 base · 2 bars · 126 BPM · Each phrase plays twice</p>
+      <div class="notice"><strong>Your instrument makes the sound.</strong> These previews use an original demo bass and drum patch. SUBMOTIF generates MIDI; this sound is not included in the plug-in.</div>
+    </section>
+
+    <section class="workspace" aria-labelledby="style-title">
+      <div class="toolbar">
+        <nav class="styles" aria-label="Bassline style" id="styles"></nav>
+        <fieldset class="mode"><legend>Preview sound</legend>
+          <label><input type="radio" name="mode" value="mix" checked> With drums</label>
+          <label><input type="radio" name="mode" value="solo"> Bass only</label>
+        </fieldset>
+      </div>
+      <div class="style-heading">
+        <div><p class="eyebrow" id="style-count">Ten candidates</p><h2 id="style-title">Deep House</h2></div>
+        <button type="button" class="quiet" id="compilation">Play all ten</button>
+      </div>
+      <div class="candidate-grid" id="candidates" tabindex="-1"></div>
+      <noscript><p>Enable JavaScript to compare and select basslines. All previews and exact MIDI files are in the adjacent media and midi folders.</p></noscript>
+    </section>
+
+    <section class="selection" aria-labelledby="selection-title">
+      <div><p class="eyebrow">Your shortlist</p><h2 id="selection-title">No picks yet.</h2></div>
+      <ul id="picked-list"></ul>
+      <p class="storage-note">Selections stay in this browser. Nothing is uploaded or approved automatically.</p>
+      <div class="selection-actions">
+        <button type="button" class="primary" id="copy-picks" disabled>Copy my six picks</button>
+        <button type="button" class="quiet" id="save-picks" disabled>Save selection file</button>
+        <button type="button" class="quiet" id="clear-picks" disabled>Clear picks</button>
+      </div>
+      <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      <textarea id="copy-fallback" readonly hidden aria-label="Selection summary for copying"></textarea>
+    </section>
+  </main>
+  <footer>
+    <p>Every candidate came from a fresh generator run. The same demo patch and level were used throughout.</p>
+    <a href="manifest.json">Seeds, settings &amp; source notes</a>
+    <a href="../index.html">Back to SUBMOTIF</a>
+  </footer>
+  <aside class="player" aria-label="Audio player">
+    <div class="now-playing"><span class="player-label">Now playing</span><strong id="now-title">Choose a bassline to listen</strong></div>
+    <audio id="audio" controls preload="none" aria-label="Selected bassline preview"></audio>
+    <button type="button" class="quiet" id="stop" disabled>Stop</button>
+  </aside>
+</body>
+</html>

@@ -1,0 +1,33 @@
+name: Feature idea
+description: Suggest a focused improvement to the music or workflow.
+title: "[Idea]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the musical or workflow problem and who it affects.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Explain how the change would work from a musician's perspective. Simple examples help.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and context
+      description: What have you tried? Add relevant theory sources, sketches, or original MIDI examples if useful.
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Where would this help?
+      multiple: true
+      options:
+        - VST3
+        - Max for Live
+        - Website or documentation
+        - Development tools

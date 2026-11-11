@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a reproducible problem in SUBMOTIF.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve SUBMOTIF. Search existing issues first.
+        Do not include private music, credentials, or personal information.
+        For security vulnerabilities, follow SECURITY.md instead of posting details here.
+  - type: input
+    id: version
+    attributes:
+      label: SUBMOTIF version
+      description: Include a release version or commit if you built it yourself.
+      placeholder: "1.2.1 development build"
+    validations:
+      required: true
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Edition
+      options:
+        - VST3
+        - Max for Live
+        - Website or documentation
+        - Build or development tools
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Your setup
+      description: OS and version, processor type, DAW and version, and Max version when relevant.
+      placeholder: "macOS version; Apple Silicon or Intel; Ableton Live version; Max version"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the style, key, scale, length, and other settings if relevant.
+      placeholder: |
+        1. Load...
+        2. Set...
+        3. Press...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Add a short screenshot, MIDI example, or sanitized log if useful and you have permission to share it.
+    validations:
+      required: true

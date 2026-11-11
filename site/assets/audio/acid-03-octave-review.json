@@ -1,0 +1,452 @@
+{
+  "version": 1,
+  "sourceCandidateId": "acid-03",
+  "sourceBatchFingerprint": "e9ed6426621b0aa0ac331289525153c9da8b5784aaab23f3d85977a704750e5c",
+  "sourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce",
+  "variants": [
+    {
+      "id": "acid-03-original",
+      "label": "Original \u00b7 C1",
+      "transposeSemitones": 0,
+      "reviewStatus": "rejected-register",
+      "audioApproved": false,
+      "midi": {
+        "path": "acid-03.mid",
+        "sha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce"
+      },
+      "pattern": {
+        "seed": 3723581205,
+        "lengthBeats": 8,
+        "notes": [
+          {
+            "start": 0,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 0.5,
+            "duration": 0.37999999046325683,
+            "pitch": 36,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 1.2649999996647239,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 2.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 36,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2.5,
+            "duration": 0.37999999046325683,
+            "pitch": 36,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 3.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 3.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 36,
+            "velocity": 84,
+            "locked": false
+          },
+          {
+            "start": 4,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 4.5,
+            "duration": 0.37999999046325683,
+            "pitch": 36,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 5.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6,
+            "duration": 0.2209999942779541,
+            "pitch": 36,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 6.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 36,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6.5,
+            "duration": 0.37999999046325683,
+            "pitch": 36,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 7.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 43,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 7.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 36,
+            "velocity": 84,
+            "locked": false
+          }
+        ]
+      },
+      "audio": {
+        "solo": {
+          "path": "acid-03-serum-solo.mp3",
+          "sha256": "4870d6438b0917ff92873609958115f61c27093e65d65ede012e583cb69719c6"
+        },
+        "mix": {
+          "path": "acid-03-serum-mix.mp3",
+          "sha256": "4ed4e561faef49a80791a66d4b518a822e9f35d67082e23378477cd802e5a7b6"
+        }
+      },
+      "render": {
+        "kind": "serum",
+        "preset": "TSP_S290V3_Bass_acid_sweep.SerumPreset",
+        "sourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce",
+        "status": "rendered-awaiting-listening-approval",
+        "requestedPreset": "TSP_S290V3_Bass_acid_sweep.SerumPreset",
+        "presetSha256": "93c9f53986530536ed74dc2dbbdea39118fda74850976ccd13444c61df9f9cf6",
+        "instrumentVersion": "2.1.4",
+        "provenance": "acid-03-serum-provenance.json"
+      }
+    },
+    {
+      "id": "acid-03-plus12",
+      "label": "+1 octave \u00b7 C2",
+      "transposeSemitones": 12,
+      "reviewStatus": "not-selected",
+      "audioApproved": false,
+      "midi": {
+        "path": "acid-03-plus12.mid",
+        "sha256": "5440e5e34bcd586c3817115d57855b3b3c54e539f2cc2482516a385a0abe7a77"
+      },
+      "pattern": {
+        "seed": 3723581205,
+        "lengthBeats": 8,
+        "notes": [
+          {
+            "start": 0,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 0.5,
+            "duration": 0.37999999046325683,
+            "pitch": 48,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 1.2649999996647239,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 2.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 48,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2.5,
+            "duration": 0.37999999046325683,
+            "pitch": 48,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 3.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 3.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 48,
+            "velocity": 84,
+            "locked": false
+          },
+          {
+            "start": 4,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 4.5,
+            "duration": 0.37999999046325683,
+            "pitch": 48,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 5.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6,
+            "duration": 0.2209999942779541,
+            "pitch": 48,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 6.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 48,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6.5,
+            "duration": 0.37999999046325683,
+            "pitch": 48,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 7.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 55,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 7.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 48,
+            "velocity": 84,
+            "locked": false
+          }
+        ]
+      },
+      "audio": {
+        "solo": {
+          "path": "acid-03-serum-plus12-solo.mp3",
+          "sha256": "6e085ee1edea841187c7e252ac9ec8912fb5b83df30500f07b84a555bc949b43"
+        },
+        "mix": {
+          "path": "acid-03-serum-plus12-mix.mp3",
+          "sha256": "d7e10cb079c9e4c51050399ab3dcffc1265a22f8d013ed15646050571faf2a0f"
+        }
+      },
+      "render": {
+        "kind": "serum",
+        "preset": "TSP_S290V3_Bass_acid_sweep.SerumPreset",
+        "sourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce",
+        "auditionMidiSha256": "5440e5e34bcd586c3817115d57855b3b3c54e539f2cc2482516a385a0abe7a77",
+        "transposeSemitones": 12,
+        "provenance": "acid-03-serum-plus12-provenance.json"
+      }
+    },
+    {
+      "id": "acid-03-plus24",
+      "label": "+2 octaves \u00b7 C3",
+      "transposeSemitones": 24,
+      "reviewStatus": "approved",
+      "audioApproved": true,
+      "midi": {
+        "path": "acid-03-plus24.mid",
+        "sha256": "275e6171bbfeeb39c9c88faeeab1eb80950a178e510799423f19c48195ba6a66"
+      },
+      "pattern": {
+        "seed": 3723581205,
+        "lengthBeats": 8,
+        "notes": [
+          {
+            "start": 0,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 0.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 1.2649999996647239,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 2.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 3.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 3.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 84,
+            "locked": false
+          },
+          {
+            "start": 4,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 4.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 5.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 6.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 7.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 67,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 7.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 84,
+            "locked": false
+          }
+        ]
+      },
+      "audio": {
+        "solo": {
+          "path": "acid-03-serum-plus24-solo.mp3",
+          "sha256": "ba4d8cd14c6d4f2262f780233f061e34e9167356f074ed8f83aa8b981f04eca7"
+        },
+        "mix": {
+          "path": "acid-03-serum-plus24-mix.mp3",
+          "sha256": "851ab2457401e8620a0748c193ed4f45dd1c1c61e5f421e8eac8d48007e15a00"
+        }
+      },
+      "render": {
+        "kind": "serum",
+        "preset": "TSP_S290V3_Bass_acid_sweep.SerumPreset",
+        "sourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce",
+        "auditionMidiSha256": "275e6171bbfeeb39c9c88faeeab1eb80950a178e510799423f19c48195ba6a66",
+        "transposeSemitones": 24,
+        "provenance": "acid-03-serum-plus24-provenance.json"
+      }
+    }
+  ],
+  "approvedVariantId": "acid-03-plus24"
+}

@@ -1,0 +1,214 @@
+{
+  "engine": "cpp",
+  "seedIndex": 63,
+  "pattern": {
+    "lengthBeats": 8,
+    "seed": 2464687099,
+    "notes": [
+      {
+        "start": 0,
+        "duration": 0.4261807541656288,
+        "pitch": 36,
+        "velocity": 113,
+        "locked": false
+      },
+      {
+        "start": 0.5,
+        "duration": 0.5241278735224831,
+        "pitch": 48,
+        "velocity": 97,
+        "locked": false
+      },
+      {
+        "start": 2.5,
+        "duration": 0.6244918405169474,
+        "pitch": 36,
+        "velocity": 95,
+        "locked": false
+      },
+      {
+        "start": 4,
+        "duration": 0.5201137584385201,
+        "pitch": 36,
+        "velocity": 107,
+        "locked": false
+      },
+      {
+        "start": 4.764999999664724,
+        "duration": 0.4468543120645054,
+        "pitch": 36,
+        "velocity": 97,
+        "locked": false
+      },
+      {
+        "start": 6,
+        "duration": 0.2649999996647239,
+        "pitch": 36,
+        "velocity": 110,
+        "locked": false
+      },
+      {
+        "start": 6.264999999664724,
+        "duration": 0.5,
+        "pitch": 36,
+        "velocity": 97,
+        "locked": false
+      },
+      {
+        "start": 6.764999999664724,
+        "duration": 0.4566303239810366,
+        "pitch": 38,
+        "velocity": 112,
+        "locked": false
+      },
+      {
+        "start": 7.264999999664724,
+        "duration": 0.23500000033527613,
+        "pitch": 36,
+        "velocity": 91,
+        "locked": false
+      },
+      {
+        "start": 7.5,
+        "duration": 0.385154413480861,
+        "pitch": 36,
+        "velocity": 81,
+        "locked": false
+      }
+    ]
+  },
+  "variation": {
+    "lengthBeats": 8,
+    "seed": 824155572,
+    "notes": [
+      {
+        "start": 0,
+        "duration": 0.4261807541656288,
+        "pitch": 36,
+        "velocity": 113,
+        "locked": false
+      },
+      {
+        "start": 0.5,
+        "duration": 0.2649999996647239,
+        "pitch": 48,
+        "velocity": 97,
+        "locked": false
+      },
+      {
+        "start": 0.7649999996647239,
+        "duration": 0.23500000033527613,
+        "pitch": 36,
+        "velocity": 86,
+        "locked": false
+      },
+      {
+        "start": 1,
+        "duration": 0.387267910442007,
+        "pitch": 36,
+        "velocity": 115,
+        "locked": false
+      },
+      {
+        "start": 1.5,
+        "duration": 0.2649999996647239,
+        "pitch": 36,
+        "velocity": 81,
+        "locked": false
+      },
+      {
+        "start": 1.7649999996647239,
+        "duration": 0.5497246132110764,
+        "pitch": 36,
+        "velocity": 88,
+        "locked": false
+      },
+      {
+        "start": 2.764999999664724,
+        "duration": 0.4845271938281866,
+        "pitch": 36,
+        "velocity": 87,
+        "locked": false
+      },
+      {
+        "start": 3.5,
+        "duration": 0.2649999996647239,
+        "pitch": 36,
+        "velocity": 88,
+        "locked": false
+      },
+      {
+        "start": 3.764999999664724,
+        "duration": 0.23500000033527613,
+        "pitch": 36,
+        "velocity": 95,
+        "locked": false
+      },
+      {
+        "start": 4,
+        "duration": 0.2649999996647239,
+        "pitch": 36,
+        "velocity": 107,
+        "locked": false
+      },
+      {
+        "start": 4.264999999664724,
+        "duration": 0.42267479250135936,
+        "pitch": 36,
+        "velocity": 88,
+        "locked": false
+      },
+      {
+        "start": 4.764999999664724,
+        "duration": 0.23500000033527613,
+        "pitch": 36,
+        "velocity": 97,
+        "locked": false
+      },
+      {
+        "start": 5,
+        "duration": 0.4152050829174146,
+        "pitch": 36,
+        "velocity": 110,
+        "locked": false
+      },
+      {
+        "start": 6.264999999664724,
+        "duration": 0.5,
+        "pitch": 38,
+        "velocity": 100,
+        "locked": false
+      },
+      {
+        "start": 6.764999999664724,
+        "duration": 0.4566303239810366,
+        "pitch": 38,
+        "velocity": 112,
+        "locked": false
+      },
+      {
+        "start": 7.264999999664724,
+        "duration": 0.23500000033527613,
+        "pitch": 36,
+        "velocity": 92,
+        "locked": false
+      },
+      {
+        "start": 7.5,
+        "duration": 0.2649999996647239,
+        "pitch": 36,
+        "velocity": 81,
+        "locked": false
+      },
+      {
+        "start": 7.764999999664724,
+        "duration": 0.23500000033527613,
+        "pitch": 36,
+        "velocity": 93,
+        "locked": false
+      }
+    ]
+  },
+  "style": "acid",
+  "profile": "default"
+}

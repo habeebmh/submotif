@@ -1,0 +1,4 @@
+# Preview: remove the blanket disallow only after publication approval.
+# Keep /review/ out of indexing even after the public site launches.
+User-agent: *
+Disallow: /

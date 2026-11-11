@@ -1,0 +1,4 @@
+# All proposed changes require the maintainer's review when the repository's
+# main-branch rules require Code Owner approval. This file alone does not enforce it.
+* @habeebmh
+/.github/CODEOWNERS @habeebmh

@@ -1,0 +1,317 @@
+{
+  "version": 1,
+  "sourceBatchFingerprint": "e9ed6426621b0aa0ac331289525153c9da8b5784aaab23f3d85977a704750e5c",
+  "batchFingerprintAlgorithm": "sha256-canonical-json-v1",
+  "sourceManifest": "../../review/manifest.json",
+  "originalRenderSources": {
+    "Source/PatternEngine.cpp": "1a9da4d0b35231749f316e75ea7a1f95fe5e9cfcc15c4162613e335fe9db6f41",
+    "Source/PatternEngine.h": "037730c0f9e432c3fa025f90fc779fd525b8a8307ed041607f0150a7c29eab31",
+    "max/undertow-core.js": "646111bc916df4e1ffb6a0976ed999a891294bbb36a19dcc11e8d25edfe00807",
+    "scripts/render_showcase.py": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+  },
+  "recordedAtUtc": "2026-11-11T06:26:59.837530+00:00",
+  "approvalBasis": "Explicit user choices supplied in conversation. The copied choices preceded the metadata-only fingerprint migration; all original candidate data and 384 audio/MIDI asset hashes were verified unchanged.",
+  "selections": [
+    {
+      "id": "deep-01",
+      "style": "Deep House",
+      "midiApproved": true,
+      "audioApproved": true,
+      "midi": {
+        "path": "deep-01.mid",
+        "sha256": "68d1661b644f20725babae397e6ee23b7d814b82484cd480afbda33c46cbcffb"
+      },
+      "audio": {
+        "mix": {
+          "path": "deep-01-mix.mp3",
+          "sha256": "9b7e0da497dcf832a983a0d9914892f4e665c9c29e6cb4578ad44bde8a50818a"
+        },
+        "solo": {
+          "path": "deep-01-solo.mp3",
+          "sha256": "0870eeacdad8e77a7c0799888eb5c268c68a458e63de1a001dc6864ec657ba21"
+        }
+      },
+      "render": {
+        "kind": "original-audition",
+        "preset": null,
+        "sourceMidiSha256": "68d1661b644f20725babae397e6ee23b7d814b82484cd480afbda33c46cbcffb",
+        "status": "approved",
+        "originalRendererSha256": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+      }
+    },
+    {
+      "id": "rolling-06",
+      "style": "Rolling",
+      "midiApproved": true,
+      "audioApproved": true,
+      "midi": {
+        "path": "rolling-06.mid",
+        "sha256": "333d2bba4e293fa64ffbe99bef919fa9b2a15295feab9880453298da38a32356"
+      },
+      "audio": {
+        "mix": {
+          "path": "rolling-06-mix.mp3",
+          "sha256": "8f367eba0a3ce1d917b6f4bd6a964f883759e1c8ac3a4d0d71775a130880e53b"
+        },
+        "solo": {
+          "path": "rolling-06-solo.mp3",
+          "sha256": "2a6bb1c54e9847bf95bd784ef05e813cb90b673f6ab43058a4df645dab61bad9"
+        }
+      },
+      "render": {
+        "kind": "original-audition",
+        "preset": null,
+        "sourceMidiSha256": "333d2bba4e293fa64ffbe99bef919fa9b2a15295feab9880453298da38a32356",
+        "status": "approved",
+        "originalRendererSha256": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+      }
+    },
+    {
+      "id": "offbeat-01",
+      "style": "Offbeat",
+      "midiApproved": true,
+      "audioApproved": true,
+      "midi": {
+        "path": "offbeat-01.mid",
+        "sha256": "e76758ff3b479193a36f7644f8f8ee6eb8668840cd051672f60260cc966f511f"
+      },
+      "audio": {
+        "mix": {
+          "path": "offbeat-01-mix.mp3",
+          "sha256": "6a653f3c649a38646ed4a4f9fe8661165490e2e93483820e8ef26931f4ac38a4"
+        },
+        "solo": {
+          "path": "offbeat-01-solo.mp3",
+          "sha256": "b56d86b9dc18d919977378ca21a3c3255f90e1d0139ac11a7a4a60da030209c2"
+        }
+      },
+      "render": {
+        "kind": "original-audition",
+        "preset": null,
+        "sourceMidiSha256": "e76758ff3b479193a36f7644f8f8ee6eb8668840cd051672f60260cc966f511f",
+        "status": "approved",
+        "originalRendererSha256": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+      }
+    },
+    {
+      "id": "acid-03",
+      "style": "Acid",
+      "midiApproved": true,
+      "audioApproved": true,
+      "midi": {
+        "path": "acid-03-plus24.mid",
+        "sha256": "275e6171bbfeeb39c9c88faeeab1eb80950a178e510799423f19c48195ba6a66"
+      },
+      "audio": {
+        "solo": {
+          "path": "acid-03-serum-plus24-solo.mp3",
+          "sha256": "ba4d8cd14c6d4f2262f780233f061e34e9167356f074ed8f83aa8b981f04eca7"
+        },
+        "mix": {
+          "path": "acid-03-serum-plus24-mix.mp3",
+          "sha256": "851ab2457401e8620a0748c193ed4f45dd1c1c61e5f421e8eac8d48007e15a00"
+        }
+      },
+      "render": {
+        "kind": "serum",
+        "preset": "TSP_S290V3_Bass_acid_sweep.SerumPreset",
+        "sourceMidiSha256": "275e6171bbfeeb39c9c88faeeab1eb80950a178e510799423f19c48195ba6a66",
+        "auditionMidiSha256": "275e6171bbfeeb39c9c88faeeab1eb80950a178e510799423f19c48195ba6a66",
+        "transposeSemitones": 24,
+        "provenance": "acid-03-serum-plus24-provenance.json",
+        "status": "approved",
+        "originalSourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce",
+        "presetSha256": "93c9f53986530536ed74dc2dbbdea39118fda74850976ccd13444c61df9f9cf6",
+        "instrumentVersion": "2.1.4"
+      },
+      "reviewVariants": "acid-03-octave-review.json",
+      "originalMidi": {
+        "path": "acid-03.mid",
+        "sha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce"
+      },
+      "pattern": {
+        "seed": 3723581205,
+        "lengthBeats": 8,
+        "notes": [
+          {
+            "start": 0,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 0.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 1.2649999996647239,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 2.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 2.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 3.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 3.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 84,
+            "locked": false
+          },
+          {
+            "start": 4,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 107,
+            "locked": false
+          },
+          {
+            "start": 4.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 106,
+            "locked": false
+          },
+          {
+            "start": 5.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6,
+            "duration": 0.2209999942779541,
+            "pitch": 60,
+            "velocity": 103,
+            "locked": false
+          },
+          {
+            "start": 6.264999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 87,
+            "locked": false
+          },
+          {
+            "start": 6.5,
+            "duration": 0.37999999046325683,
+            "pitch": 60,
+            "velocity": 105,
+            "locked": false
+          },
+          {
+            "start": 7.264999999664724,
+            "duration": 0.2209999942779541,
+            "pitch": 67,
+            "velocity": 85,
+            "locked": false
+          },
+          {
+            "start": 7.764999999664724,
+            "duration": 0.20444999917112291,
+            "pitch": 60,
+            "velocity": 84,
+            "locked": false
+          }
+        ]
+      },
+      "variantId": "acid-03-plus24",
+      "transformation": {
+        "kind": "transpose",
+        "semitones": 24,
+        "approved": true,
+        "sourceMidiSha256": "5be6e381d4ad49c3d2ada219951995ef31ec9ce12d16053d08923d9ec33e6dce"
+      },
+      "approval": {
+        "recordedAtUtc": "2026-11-11T06:50:17.431238+00:00",
+        "basis": "User explicitly selected \u201cTwo octaves higher\u201d for the website after hearing the Serum alternatives."
+      }
+    },
+    {
+      "id": "disco-01",
+      "style": "Disco",
+      "midiApproved": true,
+      "audioApproved": true,
+      "midi": {
+        "path": "disco-01.mid",
+        "sha256": "054abcca0b3c1b662dfe29044fd77dfae894cbe9d39e1e63648bf0e199858416"
+      },
+      "audio": {
+        "mix": {
+          "path": "disco-01-mix.mp3",
+          "sha256": "aa814daa9f7ee9b5d0cd77630b70ed895fd9f41e37173c3b2be123fb996fdf05"
+        },
+        "solo": {
+          "path": "disco-01-solo.mp3",
+          "sha256": "e6c5a653d4d422b79c19abc837f81a806d06530d9c48c611ab626abaa4b740d0"
+        }
+      },
+      "render": {
+        "kind": "original-audition",
+        "preset": null,
+        "sourceMidiSha256": "054abcca0b3c1b662dfe29044fd77dfae894cbe9d39e1e63648bf0e199858416",
+        "status": "approved",
+        "originalRendererSha256": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+      }
+    },
+    {
+      "id": "funk-02",
+      "style": "Funk",
+      "midiApproved": true,
+      "audioApproved": true,
+      "midi": {
+        "path": "funk-02.mid",
+        "sha256": "ad83a71b2b5ec29073e6dcb6dd9167b2e475aa6be2a05cfdfa43b45911e2d559"
+      },
+      "audio": {
+        "mix": {
+          "path": "funk-02-mix.mp3",
+          "sha256": "ce6b0340d2b2f67fa5acc8332b60c06a96731912037429c37b8b86d30fbe88b9"
+        },
+        "solo": {
+          "path": "funk-02-solo.mp3",
+          "sha256": "8b12cadae0d6891cc46851890d484e5e5f3a9b098763814ac1eb63c2fead5d82"
+        }
+      },
+      "render": {
+        "kind": "original-audition",
+        "preset": null,
+        "sourceMidiSha256": "ad83a71b2b5ec29073e6dcb6dd9167b2e475aa6be2a05cfdfa43b45911e2d559",
+        "status": "approved",
+        "originalRendererSha256": "7537e50c409aebcf645799ebbbfc52720ceeb57154b1efe9bcd537d3ca74aca2"
+      }
+    }
+  ]
+}

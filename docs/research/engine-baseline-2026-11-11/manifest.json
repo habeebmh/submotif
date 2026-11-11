@@ -1,0 +1,56 @@
+{
+  "scope": "Descriptive structural audit, not a listening test or musical-quality score.",
+  "patterns": 6144,
+  "seeds_per_condition": 256,
+  "seed_formula": "(0xa341316c + index * 2654435761) mod 2^32, index=0..seeds-1",
+  "settings": {
+    "root": 0,
+    "scale": "natural minor",
+    "bars": 2,
+    "octave": 1,
+    "density": 0.55,
+    "swing": 0.12,
+    "gate": 0.65,
+    "movement": [
+      0.35,
+      1
+    ],
+    "rootOnly": false,
+    "anchorRoot": true,
+    "octaveJumps": true
+  },
+  "variation_seed": "(base_seed + 2654435769) mod 2^32",
+  "aggregation": "Arithmetic mean of per-pattern metrics, with population standard deviation in *_sd fields. Conditional metrics are null when their denominator is empty and excluded from means; *_eligible_patterns records the denominator of each mean.",
+  "tonic_triad_reference": "C/Eb/G only. This is an explicit static C-minor test sonority, not the unknown track chords.",
+  "source_sha256": {
+    "Source/PatternEngine.h": "414a9dae57fa327ca87a73467c36e7d2aace1940689f36ed1b4960f893ecabb4",
+    "Source/PatternEngine.cpp": "2a5e7b0e2b6efeabc6d3d0543a732860ff39c5a64e51578bcd44da80d4a2705d",
+    "max/undertow-core.js": "eeacf9e47ed48fe8b4ee448dc5dba16439441d1b133117129e0a7d83dddec54b"
+  },
+  "corpus_sha256": "43bf3894ea368c6358608a29f134bffdec90f803021ef7f20360121e6772df07",
+  "metrics": {
+    "notes_per_bar": "Note count / 2; two-bar phrases in this audit.",
+    "empty_bar_pct": "Percentage of the two bars containing no note onset.",
+    "bar_onset_jaccard": "Intersection / union of bar-one/bar-two onset tick sets; ignores pitch and trailing duration.",
+    "exact_bar_rhythm_pct": "100 if the two bars have identical onset tick sets, else 0.",
+    "exact_bar_pitch_rhythm_pct": "100 if both bars have identical (onset tick, MIDI pitch) sets, else 0.",
+    "pitch_classes": "Number of distinct pitch classes in the phrase.",
+    "pitch_range_semitones": "Maximum MIDI pitch minus minimum MIDI pitch.",
+    "root_note_pct": "Percentage of notes with selected tonic pitch class.",
+    "tonic_triad_note_pct": "Percentage in C minor tonic triad C/Eb/G; a reference sonority, not known song harmony.",
+    "strong_nontriad_pct": "Percentage of quarter-beat onsets outside C/Eb/G; no claim these notes are necessarily wrong.",
+    "nontriad_duration_pct": "Percentage of total note duration outside C/Eb/G.",
+    "long_nontriad_count": "Number of notes outside C/Eb/G lasting >=0.5 beat.",
+    "unresolved_nontriad_pct": "Among nontriad notes, percentage lacking a following triad note 1\u20132 semitones away within 0.5 beat; descriptive neighbor-resolution rule.",
+    "leap_over_fifth_pct": "Percentage of cyclic adjacent-note intervals exceeding seven semitones.",
+    "compound_leap_pct": "Percentage of cyclic adjacent-note intervals exceeding twelve semitones.",
+    "loop_boundary_leap": "Absolute semitone difference between last and first MIDI pitch.",
+    "second_bar_first_root_pct": "100 if first onset in second bar is tonic, else 0; 0 for empty bar.",
+    "final_note_triad_pct": "100 if final onset is C/Eb/G, else 0.",
+    "offbeat_eighth_pct": "Percentage of onsets at half-beat positions between quarter pulses.",
+    "sixteenth_pct": "Percentage at odd sixteenth positions (including swing).",
+    "variation_count_ratio": "One same-control Variation count divided by original count.",
+    "variation_new_onset_pitch_pct": "Percentage of Variation notes with no identical onset tick and MIDI pitch in original.",
+    "scale_violations": "Count outside C natural minor; must remain zero for these unlocked settings."
+  }
+}
