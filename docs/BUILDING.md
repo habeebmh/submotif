@@ -1,6 +1,6 @@
 # Build Submotif
 
-`plugin/scripts/build.py` configures, compiles and tests the VST3, standalone inspection application, and Max engine. It never installs a plugin, creates a GitHub Release or publishes the website. Public release packaging remains on hold.
+`plugin/scripts/build.py` configures, compiles and tests the VST3, standalone inspection application, and Max engine. It never installs a plugin, creates a GitHub Release or publishes the website. Public release packaging is a separate explicit step.
 
 ## Targets
 
@@ -68,7 +68,7 @@ python3 plugin/scripts/build.py --target macos-arm64 --core-only
 python3 plugin/scripts/build.py --target macos-universal --dry-run
 ```
 
-The old `build-macos.sh` entry point remains compatible: it builds Apple Silicon into `plugin/build/`, or the portable engine into `plugin/build-core/` with `--core-only`. The held legacy release packager still expects that location.
+The old `build-macos.sh` entry point remains compatible: it builds Apple Silicon into `plugin/build/`, or the portable engine into `plugin/build-core/` with `--core-only`. The legacy Mac release packager still expects that location.
 
 ## Build every platform on GitHub
 
@@ -90,7 +90,7 @@ References: [CMake Mac architectures](https://cmake.org/cmake/help/latest/variab
 
 Owner-directed work happens directly on `main`. External contributions can still use pull requests. Every release must have an immutable **annotated** tag `vMAJOR.MINOR.PATCH`, matching the version in `plugin/CMakeLists.txt` and pointing to a commit in main's history.
 
-Release publication is currently on hold. To inspect the future tag without creating one:
+Release publication requires an explicit owner request. To inspect the next tag without creating one:
 
 ```sh
 python3 plugin/scripts/release-tag.py --dry-run
@@ -102,4 +102,8 @@ After approval, update the CMake version, commit and push main, and wait for its
 python3 plugin/scripts/release-tag.py --create --push
 ```
 
-The script refuses dirty/non-main checkouts, an existing tag, or a main commit that differs from the remote. Tag pushes trigger all four native builds; CI rejects lightweight tags, version mismatches and commits outside main. The legacy release packager also requires a valid release tag. Tags are never force-moved. Any eventual GitHub Release must use that same tag; the build workflow itself does not publish Releases.
+The script refuses dirty/non-main checkouts, an existing tag, or a main commit that differs from the remote. Tag pushes trigger **Release builds** for all four native targets; CI rejects lightweight tags, version mismatches and commits outside main. Tags are never force-moved. The workflow creates a draft GitHub Release and uploads source-inclusive ZIPs directly, without relying on temporary Actions artifact downloads. It never publishes the draft automatically.
+
+Each target runs all applicable native and cross-edition checks, then `package-release.py --target <target> --tag vMAJOR.MINOR.PATCH` validates the tested commit, clean working tree, source fingerprints, archive checksums, binary hashes and architecture. Mac signatures are verified again. ZIPs preserve executable modes and symlinks, include installation instructions, and have adjacent SHA-256 and provenance files. Asset names stay stable so the website can use `/releases/latest/download/<filename>`.
+
+After every target passes and all twelve assets (four ZIPs, four checksum files and four provenance files) are verified, publish the draft with `gh release edit vMAJOR.MINOR.PATCH --draft=false --latest`. The installation guide records the current signing status. Do not overwrite published assets; corrections require a new version and tag.

@@ -2,15 +2,21 @@
 
 Paths under `dist/` refer to local development evidence and are not included in the public source checkout. The documented scripts reproduce automated checks; historical host observations are recorded below.
 
-Development validation recorded on November 11, 2026 (UTC) on Apple Silicon (M2 Max), macOS 26.5.2, with Ableton Live 12.4.16 Suite and its Max runtime. **Release packaging is on hold while the product is refined.** This document describes development evidence, not a guarantee that every host or workflow is bug-free.
+Development validation recorded on November 11, 2026 (UTC) on Apple Silicon (M2 Max), macOS 26.5.2, with Ableton Live 12.4.16 Suite and its Max runtime. This document describes development evidence, not a guarantee that every host or workflow is bug-free.
 
-## 1.2.2 Submotif rename
+## 1.2.2 release builds
+
+Native automation now covers Apple Silicon, Intel, universal Mac and Windows x64. All four targets passed the native build matrix before release preparation. Every tagged release build reruns its own native checks, 38 Max test groups, 1,260-pattern parity comparison and seven composition audit tests. The Windows suite currently covers engine, processor and editor; the additional real VST3 wrapper harness runs on Mac. Release packaging verifies source fingerprints, tested binary hashes, archive checksums, architecture and Mac ad-hoc signatures.
+
+The musical refinement adds motif continuity, harmonic-role constraints and bounded phrase variation to both engines. These structural checks are not a listening-quality score. Broad DAW and listening tests remain ongoing; the historical host observations below are not claims about every released target.
+
+## 1.2.2 Submotif rename (earlier development snapshot)
 
 - Both editions now display **SUBMOTIF**, manufacturer **Habeeb**. Build outputs are `Submotif.vst3` and `plugin/max/Submotif.amxd`.
 - Persistent VST3 component/controller IDs, bundle ID, state schema, and the exact musical-core source hashes are unchanged. Internal `Undertow` target/source identifiers remain for compatibility.
 - The renamed build passes all four CTest suites, 32 Max groups, and 1,260-pattern cross-edition parity. The native editor run passes 1,691 checks; actual screenshots are in `dist/ui-v1.2.2/`.
 - VST3 and standalone development signatures verify. This build has not been installed or retested in Live; the historical observations and remaining host checks below still apply.
-- Packaging and release publication remain on hold. No release archive was generated.
+- At this earlier rename snapshot, no release archive was generated. See the release-build section above for current packaging.
 
 ## 1.2.1 branding update
 
@@ -69,7 +75,7 @@ The following are pending: loading the repaired 1.2 VST3 in Live, the final Max 
 
 ## Scope and limits
 
-- This binary is Apple Silicon macOS only. No Intel, Windows, AU, or other-host binary validation is claimed.
+- Historical host observations above used Apple Silicon macOS. Native CI additionally validates Intel, universal Mac and Windows x64 builds; interactive DAW coverage on those targets remains pending. No AU edition is supplied.
 - Ordinary VST3 uses Ableton's documented two-track routing. The Max MIDI effect provides placement before an instrument on the same track.
 - Patterns use 4/4 and 1, 2, 4, or 8 bars. The engine does not infer chords or keys from audio. Published research informs constraints; the numerical style probabilities are authored design choices.
 - The VST schedules MIDI on the audio callback. The Max edition runs on Max's message thread and can jitter under load; use its exported MIDI clips for host-scheduled timing.

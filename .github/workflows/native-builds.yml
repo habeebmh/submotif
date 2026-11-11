@@ -5,7 +5,6 @@ on:
     paths: ['plugin/**', '.github/workflows/native-builds.yml', 'docs/BUILDING.md']
   push:
     branches: [main]
-    tags: ['v*']
     paths: ['plugin/**', '.github/workflows/native-builds.yml', 'docs/BUILDING.md']
   workflow_dispatch:
 
@@ -47,12 +46,6 @@ jobs:
           package-manager-cache: false
       - name: Test build orchestration
         run: python plugin/tests/build-tests.py
-      - name: Validate release tag
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
-        shell: bash
-        run: python plugin/scripts/release-tag.py --check "$RELEASE_TAG"
       - name: Build and test native products
         run: python plugin/scripts/build.py --target ${{ matrix.target }} --jobs 2 --artifact
       # tar preserves executable permissions, symlinks and complete source/notices.

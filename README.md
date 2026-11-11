@@ -6,9 +6,9 @@ SUBMOTIF is a free, open-source MIDI bassline generator for house music. Choose 
 
 ![SUBMOTIF's compact editor with style, key, scale and length controls above a MIDI piano roll](web/assets/images/submotif-editor.png)
 
-**Preview status:** version 1.2.2 is in development. Release packaging and downloads remain on hold pending review. Source, issues, and contributions are available on GitHub. No public release download is available yet.
+**Version 1.2.2:** free downloads for Apple Silicon, Intel Mac and Windows x64, including Max for Live. [Download the latest release](https://github.com/habeebmh/submotif/releases/latest) and read the [installation guide](docs/INSTALL.md). Mac builds are not notarized; Windows builds are unsigned.
 
-[Website preview](https://submotif.web.app) · [GitHub](https://github.com/habeebmh/submotif) · [Latest release](https://github.com/habeebmh/submotif/releases/latest) · [Contribute](docs/CONTRIBUTING.md) · [Report an issue](https://github.com/habeebmh/submotif/issues)
+[Website](https://submotif.web.app) · [GitHub](https://github.com/habeebmh/submotif) · [Latest release](https://github.com/habeebmh/submotif/releases/latest) · [Contribute](docs/CONTRIBUTING.md) · [Report an issue](https://github.com/habeebmh/submotif/issues)
 
 Listen to [six selected examples](https://submotif.web.app/#showcase), including Acid through Serum at the approved higher register. These recordings demonstrate MIDI played through instruments; the plugin itself supplies MIDI only.
 
@@ -31,9 +31,9 @@ The generation rules draw on research into groove, tonal stability, and melodic 
 | **VST3** | Sends MIDI to your instrument. In Ableton Live, use two MIDI tracks. | Build targets: Intel/Apple Silicon macOS 11+ and Windows x64, in a VST3 host that exposes plug-in MIDI output. |
 | **Max for Live** | Goes directly before your instrument on one Ableton MIDI track. | Live Suite, or Live Standard with Max for Live; Max 9.1.3+. |
 
-Native build automation covers Intel Mac, Apple Silicon, universal Mac and Windows x64. Release and DAW compatibility approval remain pending. See [validation notes](docs/VALIDATION.md) for completed checks and remaining host testing. A passing automated test is not a compatibility guarantee.
+Native build automation covers Intel Mac, Apple Silicon, universal Mac and Windows x64. Broader DAW compatibility testing remains pending. See [validation notes](docs/VALIDATION.md) for completed checks and remaining host testing. A passing automated test is not a compatibility guarantee.
 
-Official releases will be free to download from [GitHub Releases](https://github.com/habeebmh/submotif/releases/latest) after review. No payment, follow, or contribution is required. Check the release notes for supported systems, installation instructions, and signing status before installing a build.
+Official releases are free to download from [GitHub Releases](https://github.com/habeebmh/submotif/releases/latest). No payment, follow, or contribution is required. Check the release notes for supported systems, installation instructions, and signing status before installing a build.
 
 ## Start in Ableton
 
@@ -94,7 +94,7 @@ python3 plugin/scripts/build.py --target macos-universal
 py -3.12 plugin/scripts/build.py --target windows-x64
 ```
 
-Use `macos-arm64` or `macos-x86_64` for a single Mac architecture. The **Native builds** GitHub workflow builds and tests all four targets and uploads temporary development artifacts. Output folders, dependencies, test coverage and signing status are documented in the [build guide](docs/BUILDING.md). Public releases remain on hold.
+Use `macos-arm64` or `macos-x86_64` for a single Mac architecture. The **Native builds** GitHub workflow builds and tests all four targets and uploads temporary development artifacts. Output folders, dependencies, test coverage and signing status are documented in the [build guide](docs/BUILDING.md). Annotated version tags trigger the separate release workflow, which uploads verified ZIPs to a draft GitHub Release for explicit publication.
 
 JUCE is pinned in `plugin/CMakeLists.txt`. The first configuration fetches it when `.deps/JUCE` is absent, so internet access is needed for that step. Review [third-party notices](docs/THIRD_PARTY_NOTICES.md) before redistributing a build.
 
