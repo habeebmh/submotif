@@ -48,6 +48,9 @@ jobs:
       - name: Test build orchestration
         run: python3 -B plugin/tests/build-tests.py
 
+      - name: Test release tag rules
+        run: python3 -B plugin/tests/release-tag-tests.py
+
       - name: Test composition audit metrics
         run: python3 -B plugin/tests/audit-tests.py
 

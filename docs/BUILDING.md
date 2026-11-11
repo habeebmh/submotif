@@ -85,3 +85,21 @@ python3 plugin/scripts/build.py --target macos-universal --artifact
 Artifacts go to `dist/builds/`. A source-inclusive artifact requires the clean pinned JUCE checkout used by the build. It includes actual working-tree plugin source, and `BUILD.json` reports whether the working tree was dirty. Do not edit source while a build is running. Unversioned source copies can be rebuilt without Git history; their manifest reports an unknown revision/dirty state. Source fingerprints prevent artifacts from being produced if plugin code changes during the build or source copy. The full Max folder is architecture-independent and included with each target for convenience.
 
 References: [CMake Mac architectures](https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_ARCHITECTURES.html), [CMake Visual Studio x64 selection](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2017%202022.html), [GitHub runner labels](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job).
+
+## Release tags
+
+Owner-directed work happens directly on `main`. External contributions can still use pull requests. Every release must have an immutable **annotated** tag `vMAJOR.MINOR.PATCH`, matching the version in `plugin/CMakeLists.txt` and pointing to a commit in main's history.
+
+Release publication is currently on hold. To inspect the future tag without creating one:
+
+```sh
+python3 plugin/scripts/release-tag.py --dry-run
+```
+
+After approval, update the CMake version, commit and push main, and wait for its native checks to pass. Then create and push the annotated tag:
+
+```sh
+python3 plugin/scripts/release-tag.py --create --push
+```
+
+The script refuses dirty/non-main checkouts, an existing tag, or a main commit that differs from the remote. Tag pushes trigger all four native builds; CI rejects lightweight tags, version mismatches and commits outside main. The legacy release packager also requires a valid release tag. Tags are never force-moved. Any eventual GitHub Release must use that same tag; the build workflow itself does not publish Releases.

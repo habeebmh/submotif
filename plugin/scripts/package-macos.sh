@@ -3,6 +3,8 @@ set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repo_dir="$(cd "$project_dir/.." && pwd)"
+release_tag="$(git -C "$repo_dir" describe --exact-match --tags HEAD)"
+python3 "$project_dir/scripts/release-tag.py" --check "$release_tag"
 plugin="$project_dir/build/Undertow_artefacts/Release/VST3/Submotif.vst3"
 bundle_name=Submotif-macOS-arm64
 dist_dir="$project_dir/dist"
