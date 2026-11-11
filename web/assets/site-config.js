@@ -1,7 +1,7 @@
 window.UNDERTOW_SITE = Object.freeze({
   repository: 'https://github.com/habeebmh/submotif',
   releaseUrl: 'https://github.com/habeebmh/submotif/releases/latest',
-  releaseReady: false,
+  releaseReady: true,
   instagram: 'https://www.instagram.com/habeeeeeeeeeeeeeeeb/',
   licenseLabel: 'AGPLv3 license',
   licenseStatus: 'AGPL-3.0-only',

@@ -57,7 +57,7 @@ strong,b{font-weight:500}
  .workflow-grid>.workflow-path{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0}
 }
 .setup-link{align-self:start}
-.close__word{line-height:1.05;overflow:visible}
+.close__word{font-size:clamp(56px,7vw,96px);line-height:1.05;overflow:visible}
 .footer__col h3{font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:16px}
 .footer__col>a{display:flex;align-items:center;min-height:44px;font-size:14px}
 .footer__legal{font-size:13px}
@@ -117,3 +117,8 @@ strong,b{font-weight:500}
 
 .closing__links>.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .closing__links .span-3{grid-column:auto}
+
+.download-options{display:flex;flex-wrap:wrap;gap:8px 32px;margin-block:8px 12px}
+.download-options .link{display:inline-flex;align-items:center;min-height:44px}
+.release-note{max-width:66ch;font-size:14px;line-height:1.6;color:var(--muted)}
+.release-note .link{display:inline-flex;align-items:center;min-height:44px}
