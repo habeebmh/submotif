@@ -21,7 +21,8 @@ strong,b{font-weight:500}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .hero-facts{font-size:14px;color:var(--muted)}
 .hero__media{isolation:isolate}
-.product-ground{position:absolute;inset:0;z-index:0;background:var(--surface)}
+/* Keep decoration out of the animation loop: a resized WebGL buffer flashed black under load. */
+.product-ground{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 76% 18%,#33412b,var(--surface) 66%)}
 .hero__media>.product-shot{inset:12% 24px auto;width:calc(100% - 48px);height:auto;object-fit:contain;z-index:1;border-radius:12px;border:1px solid var(--line-strong)}
 .ly-float{color:var(--ink);background:var(--surface);border:1px solid var(--line-strong)}
 .midi-output{display:flex;align-items:center;gap:16px;margin-top:16px;font-size:20px}
