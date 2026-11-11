@@ -17,7 +17,7 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = [ROOT / 'src/PatternEngine.cpp', ROOT / 'src/PatternEngine.h',
+SOURCES = [ROOT / 'src/PatternEngine.cpp', ROOT / 'src/PatternEngine.h', ROOT / 'tests/GenerationProbe.cpp',
            ROOT / 'max/undertow-core.js']
 
 

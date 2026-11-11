@@ -5,6 +5,9 @@ from pathlib import Path
 import struct
 import tempfile
 import unittest
+from unittest.mock import patch
+import json
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('submotif_build', ROOT / 'scripts/build.py')
@@ -61,5 +64,23 @@ class BuildTests(unittest.TestCase):
     def test_rebuilding_an_unversioned_source_copy_does_not_require_git_history(self):
         with tempfile.TemporaryDirectory() as folder:
             self.assertEqual(build.source_provenance(Path(folder)), (None, None))
+
+    def test_failed_rebuild_cannot_leave_an_old_success_manifest(self):
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder); manifest = directory / 'BUILD.json'
+            manifest.write_text(json.dumps({'tests':'passed','sourceCommit':'old'}))
+            product=directory/'Submotif';product.write_bytes(b'old binary')
+            def fake_run(command, **kwargs):
+                if command[0] == 'cmake' and '--build' in command:
+                    product.write_bytes(b'rebuilt binary')
+                if command[0] == 'ctest': raise subprocess.CalledProcessError(1, command)
+            with patch.object(build.platform, 'system', return_value='Darwin'), \
+                 patch.object(build.shutil, 'which', return_value='/fake/tool'), \
+                 patch.object(build, 'run', side_effect=fake_run), \
+                 patch.object(build, 'verify_products', return_value=(product,product,[product])), \
+                 patch.object(build.sys, 'argv', ['build.py','--target','macos-arm64','--build-dir',str(directory)]):
+                with self.assertRaises(subprocess.CalledProcessError): build.main()
+            self.assertEqual(product.read_bytes(), b'rebuilt binary')
+            self.assertFalse(manifest.exists() and json.loads(manifest.read_text()).get('tests') == 'passed')
 
 if __name__ == '__main__': unittest.main()

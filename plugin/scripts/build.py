@@ -194,6 +194,10 @@ def main():
         for tool in ('cmake', 'ctest') + (() if args.core_only or args.skip_tests else ('node',)):
             if not shutil.which(tool): raise ValueError(f'{tool} is required; see docs/BUILDING.md')
         check_cache(plan['directory'], plan['target'])
+        manifest_path = plan['directory'] / 'BUILD.json'
+        # A failed rebuild can already have replaced binaries. Never retain an
+        # earlier success claim for the now-partially-rebuilt output directory.
+        manifest_path.unlink(missing_ok=True)
         before = source_fingerprint(PLUGIN)
         run(plan['configure']); run(plan['build'])
         products = None if args.core_only else verify_products(plan)
@@ -213,7 +217,9 @@ def main():
                     'signing': 'unsigned' if system == 'Windows' else 'ad-hoc development',
                     'binaries': {str(p.relative_to(plan['directory'])): sha(p) for p in products[2]} if products else {},
                     'releasePublished': False}
-        (plan['directory'] / 'BUILD.json').write_text(json.dumps(manifest, indent=2) + '\n')
+        pending_manifest = plan['directory'] / '.BUILD.json.tmp'
+        pending_manifest.write_text(json.dumps(manifest, indent=2) + '\n')
+        os.replace(pending_manifest, manifest_path)
         if args.artifact: development_artifact(plan, products, manifest)
         print(f'Build complete: {plan["directory"]}', flush=True)
 
