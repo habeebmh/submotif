@@ -13,6 +13,16 @@ Keep these four files together in one folder:
 
 Copy that folder to your Ableton User Library, or add the folder to Places. Drag `Submotif.amxd` onto a MIDI track **before** the instrument. The device is intentionally editable and ships with adjacent source files; moving the AMXD alone will lose its dependencies. `Submotif.maxpat` is an additional source copy and is not the device to load in Live.
 
+## Use with Serum
+
+Use one MIDI track with this device chain:
+
+**Submotif.amxd → Serum → audio effects**
+
+Load `Submotif.amxd` from User Library or Max for Live, and place it to the left of Serum. Keep your Serum preset loaded. Press Generate, enable Live MIDI, and start Live's transport. Submotif sends the notes; Serum supplies the sound.
+
+The VST3 edition occupies an instrument slot in Live and uses two MIDI tracks. This Max edition is the MIDI effect intended for placement before Serum on a single track.
+
 ## Make a bassline
 
 Choose **Style**, **Key**, **Scale**, and **Length**, then press **Generate**. New devices start in C minor at C1 with a one-bar loop. **Density** chooses fewer or more notes; **Melody** chooses less or more pitch movement. Each Generate constructs a fresh motif from weighted choices, then develops it through repetition and related answers. There is no premade bassline bank.

@@ -39,6 +39,8 @@ Official releases will be free to download from [GitHub Releases](https://github
 
 ### Max for Live: one track
 
+For Serum on the same Ableton track, use **Submotif.amxd → Serum → audio effects**. Load the Max MIDI device from your User Library. Live treats the VST3 edition as an instrument, so dropping that edition onto Serum can replace Serum; its routing uses the separate track described below.
+
 1. Keep `Submotif.amxd`, `undertow.js`, `undertow-core.js`, and `undertow-roll.js` together in one folder. Add that folder to Live's **Places** or copy it into your User Library.
 2. Drag **Submotif.amxd** onto a MIDI track, before your bass instrument.
 3. Choose a style and key, press **Generate**, enable **Live MIDI**, and start Live's transport.

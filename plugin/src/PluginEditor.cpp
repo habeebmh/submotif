@@ -441,7 +441,7 @@ public:
         addButton(help, "Help", "Routing, MIDI export and note cleanup.", [this] { showMenu(); });
         identify(help, "help", "Help and MIDI actions"); help.getProperties().set("quiet", true);
         output.setButtonText("Live MIDI"); addAndMakeVisible(output); identify(output, "midi-output", "Live MIDI output");
-        output.setTooltip("Send the phrase to your instrument while the DAW plays. Turn off after dropping MIDI to avoid doubling notes.");
+        output.setTooltip("Send MIDI to your instrument while the DAW plays. Ableton VST3 uses two MIDI tracks; use the Max for Live device before Serum for one-track playback. Turn off after exporting to avoid doubled notes.");
         output.onClick = [this] { processor.setEnabled(output.getToggleState()); status(output.getToggleState() ? "Live MIDI on. Play your DAW to hear your instrument." : "Live MIDI off. Your exported clips can play."); };
         addAndMakeVisible(roll); identify(roll, "piano-roll", "Bassline piano roll");
         roll.onLock = [this](int i) { processor.toggleLock(i); syncPattern(); };
@@ -630,14 +630,17 @@ private:
     void showRouting()
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon, "Connect your instrument",
-            "SUBMOTIF sends MIDI notes. Your instrument supplies the sound.\n\n"
-            "In your DAW, route SUBMOTIF's MIDI output to your instrument and enable Live MIDI. Start the DAW transport. Routing options depend on your host.\n\n"
-            "Ableton Live · VST3\n"
-            "1. Put SUBMOTIF on one MIDI track and your instrument on a second.\n"
-            "2. On the instrument track, select SUBMOTIF's track under MIDI From, then SUBMOTIF in the lower chooser.\n"
-            "3. Set Monitor to In and start playback.\n\n"
-            "To keep the phrase, drag MIDI onto your instrument track. Turn Live MIDI off here, and set that track's Monitor to Auto so its clips play. Click Drag MIDI, or choose Help > Save MIDI, to save a file instead.\n\n"
-            "For one-track placement in Live, use SUBMOTIF's Max for Live device before your instrument.", "Got it", this);
+            "Your instrument supplies the sound.\n\n"
+            "Ableton Live · one track\n"
+            "Load Submotif.amxd from the Max for Live edition before Serum or another instrument. Enable Live MIDI and start Live's transport.\n\n"
+            "Chain: Submotif MIDI device > Serum > audio effects\n\n"
+            "Ableton Live · VST3 edition\n"
+            "Live loads this VST3 as an instrument. Dropping it onto Serum can replace Serum. Use two MIDI tracks:\n"
+            "1. Put SUBMOTIF VST3 on its own MIDI track and Serum on a second.\n"
+            "2. On Serum's track, select SUBMOTIF's track under MIDI From, then SUBMOTIF in the lower chooser.\n"
+            "3. Set Monitor to In, enable Live MIDI here, and start playback.\n\n"
+            "To keep the phrase, drag MIDI onto Serum's track. Turn Live MIDI off here and set that track's Monitor to Auto to play the clip.\n\n"
+            "Other DAWs: route this plug-in's MIDI output to your instrument using your host's MIDI routing.", "Got it", this);
     }
     UndertowProcessor& processor;
     Theme theme;
