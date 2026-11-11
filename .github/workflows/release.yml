@@ -3,12 +3,22 @@ name: Release builds
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing annotated release tag to build
+        required: true
+        type: string
+      publish:
+        description: Publish after all targets pass (requires explicit owner approval)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.release_tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -19,18 +29,17 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: ${{ inputs.release_tag || github.ref }}
           fetch-depth: 0
           persist-credentials: false
       - name: Validate tag and create draft
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         shell: bash
         run: |
           python3 plugin/scripts/release-tag.py --check "$RELEASE_TAG"
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            test "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" = true
-          else
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --verify-tag --draft --title "Submotif $RELEASE_TAG" --notes-file "docs/releases/$RELEASE_TAG.md"
           fi
   build:
@@ -55,6 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: ${{ inputs.release_tag || github.ref }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
@@ -66,24 +76,74 @@ jobs:
           package-manager-cache: false
       - name: Validate tag and packaging
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         shell: bash
         run: |
           python plugin/scripts/release-tag.py --check "$RELEASE_TAG"
           python plugin/tests/package-release-tests.py
-      - name: Build and test
-        run: python plugin/scripts/build.py --target ${{ matrix.target }} --jobs 2 --artifact
-      - name: Package verified release
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
-        shell: bash
-        run: python plugin/scripts/package-release.py --target ${{ matrix.target }} --tag "$RELEASE_TAG"
-      - name: Upload to draft release
+      - name: Check for an already verified target
+        id: existing
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+          RELEASE_TARGET: ${{ matrix.target }}
         shell: bash
         run: |
-          test "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" = true
+          mkdir -p dist/release-existing
+          gh release view "$RELEASE_TAG" --json assets > dist/release-existing/assets.json
+          python - <<'PY'
+          import json, os, pathlib, subprocess
+          folder = pathlib.Path('dist/release-existing')
+          name = 'Submotif-' + os.environ['RELEASE_TARGET']
+          assets = {a['name']: a for a in json.loads((folder/'assets.json').read_text())['assets'] if a['state'] == 'uploaded'}
+          expected = [name+'.zip', name+'.zip.sha256', name+'.json']
+          present = [n for n in expected if n in assets]
+          if present and len(present) != 3:
+              raise SystemExit('Partial target already exists; inspect it before retrying. Nothing overwritten.')
+          if present:
+              for suffix in ('.json', '.zip.sha256'):
+                  subprocess.run(['gh','release','download',os.environ['RELEASE_TAG'],'--pattern',name+suffix,'--dir',str(folder)],check=True)
+              metadata = json.loads((folder/(name+'.json')).read_text())
+              assert metadata['tag'] == os.environ['RELEASE_TAG']
+              assert metadata['target'] == os.environ['RELEASE_TARGET']
+              assert metadata['sourceCommit'] == subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+              assert metadata['tests'] == 'passed'
+              digest, filename = (folder/(name+'.zip.sha256')).read_text().strip().split('  ',1)
+              assert filename == name+'.zip' and assets[filename]['digest'] == 'sha256:'+digest
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('ready='+str(bool(present)).lower()+'\n')
+          PY
+      - name: Build and test
+        if: steps.existing.outputs.ready != 'true'
+        run: python plugin/scripts/build.py --target ${{ matrix.target }} --jobs 2 --artifact
+      - name: Package verified release
+        if: steps.existing.outputs.ready != 'true'
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+        shell: bash
+        run: python plugin/scripts/package-release.py --target ${{ matrix.target }} --tag "$RELEASE_TAG"
+      - name: Upload missing release target
+        if: steps.existing.outputs.ready != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+        shell: bash
+        run: |
           gh release upload "$RELEASE_TAG" dist/releases/"$RELEASE_TAG"/Submotif-${{ matrix.target }}.*
-      # Publication is a separate, explicit owner-authorized action after all targets pass.
+      # No --clobber: published files are immutable, and retries verify existing assets.
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.release_tag }}
+          persist-credentials: false
+      - name: Publish the owner-approved release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file "docs/releases/$RELEASE_TAG.md"

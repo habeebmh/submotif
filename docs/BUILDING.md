@@ -107,3 +107,7 @@ The script refuses dirty/non-main checkouts, an existing tag, or a main commit t
 Each target runs all applicable native and cross-edition checks, then `package-release.py --target <target> --tag vMAJOR.MINOR.PATCH` validates the tested commit, clean working tree, source fingerprints, archive checksums, binary hashes and architecture. Mac signatures are verified again. ZIPs preserve executable modes and symlinks, include installation instructions, and have adjacent SHA-256 and provenance files. Asset names stay stable so the website can use `/releases/latest/download/<filename>`.
 
 After every target passes and all twelve assets (four ZIPs, four checksum files and four provenance files) are verified, publish the draft with `gh release edit vMAJOR.MINOR.PATCH --draft=false --latest`. The installation guide records the current signing status. Do not overwrite published assets; corrections require a new version and tag.
+
+### Resume an interrupted release
+
+From Actions → Release builds → Run workflow, enter the existing annotated tag. The workflow checks out that exact tag, verifies complete existing targets against their published provenance and GitHub ZIP digest, and builds only missing targets. Partial target uploads require inspection; existing assets are never overwritten. The optional Publish checkbox defaults off and may only be enabled after an explicit owner request. It updates the release notes and publishes only after all four targets pass.

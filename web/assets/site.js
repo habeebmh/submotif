@@ -8,7 +8,7 @@
  const instagram=safeExternal(config.instagram);
  if(instagram){document.querySelectorAll('[data-instagram]').forEach(a=>{a.href=instagram;a.rel='noopener noreferrer'});document.querySelectorAll('[data-instagram-box]').forEach(e=>e.hidden=false)}
  const release=safeExternal(config.releaseUrl);
- if(config.releaseReady&&release){document.querySelectorAll('[data-download],[data-download-final]').forEach(a=>a.href=release);document.querySelector('#release-status').textContent='Free · macOS 11+ (Apple Silicon + Intel) · Windows x64.'}
+ if(config.releaseReady&&release){document.querySelectorAll('[data-download],[data-download-final]').forEach(a=>a.href=release);document.querySelector('#release-status').textContent='Free · macOS 11+ · Apple Silicon + Intel.'}
  else{const final=document.querySelector('[data-download-final]');final.setAttribute('aria-disabled','true');final.removeAttribute('href');final.setAttribute('tabindex','0');final.setAttribute('title','The first public release is not available yet.');final.addEventListener('click',e=>e.preventDefault())}
  const names=['Deep House','Rolling','Offbeat','Acid','Disco','Funk'];
  // The shared core validates the approved MIDI patterns; generation happens in the plugin.

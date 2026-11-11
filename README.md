@@ -6,7 +6,7 @@ SUBMOTIF is a free, open-source MIDI bassline generator for house music. Choose 
 
 ![SUBMOTIF's compact editor with style, key, scale and length controls above a MIDI piano roll](web/assets/images/submotif-editor.png)
 
-**Version 1.2.2:** free downloads for Apple Silicon, Intel Mac and Windows x64, including Max for Live. [Download the latest release](https://github.com/habeebmh/submotif/releases/latest) and read the [installation guide](docs/INSTALL.md). Mac builds are not notarized; Windows builds are unsigned.
+**Version 1.2.2:** the universal Mac download supports Apple Silicon and Intel and includes Max for Live. Windows and separate-architecture Mac uploads are waiting for GitHub’s release runners. [Download the latest release](https://github.com/habeebmh/submotif/releases/latest) and read the [installation guide](docs/INSTALL.md). Mac builds are not notarized; Windows builds are unsigned.
 
 [Website](https://submotif.web.app) · [GitHub](https://github.com/habeebmh/submotif) · [Latest release](https://github.com/habeebmh/submotif/releases/latest) · [Contribute](docs/CONTRIBUTING.md) · [Report an issue](https://github.com/habeebmh/submotif/issues)
 
