@@ -5,14 +5,14 @@ from pathlib import Path
 import hashlib
 import re
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 PAGES = {"terms": "terms", "liability": "liability", "privacy": "privacy", "license-guide": "license"}
 # Exact GNU response retrieved from https://www.gnu.org/licenses/agpl-3.0.txt.
 AGPL_SHA256 = "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
 LOCAL_DOCUMENTS = {
     "../../LICENSE": "AGPL-3.0.txt",
-    "../../THIRD_PARTY_NOTICES.md": "THIRD_PARTY_NOTICES.txt",
-    "../../CONTRIBUTING.md": "CONTRIBUTING.txt",
+    "../THIRD_PARTY_NOTICES.md": "THIRD_PARTY_NOTICES.txt",
+    "../CONTRIBUTING.md": "CONTRIBUTING.txt",
 }
 
 
@@ -35,7 +35,7 @@ def main():
     license_bytes = (ROOT / "LICENSE").read_bytes()
     if hashlib.sha256(license_bytes).hexdigest() != AGPL_SHA256:
         raise ValueError("LICENSE differs from the verified official GNU AGPLv3 text; review before rendering.")
-    target = ROOT / "site/legal"
+    target = ROOT / "web/legal"
     target.mkdir(parents=True, exist_ok=True)
     for source, name in LOCAL_DOCUMENTS.items():
         # Preserve the exact license and keep reference documents available offline.

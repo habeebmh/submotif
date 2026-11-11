@@ -4,13 +4,13 @@
 
 Copyright (C) 2026 Habeeb and SUBMOTIF contributors.
 
-SUBMOTIF's original source code is licensed under the **GNU Affero General Public License, version 3 only (AGPL-3.0-only)**. See [LICENSE](LICENSE) for the complete license and the [license guide](docs/legal/license-guide.md) for applicability and contribution information. Third-party components retain their own copyright and license notices below; this project notice does not replace them.
+SUBMOTIF's original source code is licensed under the **GNU Affero General Public License, version 3 only (AGPL-3.0-only)**. See [LICENSE](../LICENSE) for the complete license and the [license guide](legal/license-guide.md) for applicability and contribution information. Third-party components retain their own copyright and license notices below; this project notice does not replace them.
 
 ## JUCE
 
 Submotif's VST3 and standalone application use the JUCE Framework, pinned to commit `dabd5ad13cd869cba41046947fffc8e5ce5cd662` (`8.0.17-security`). The checkout's `LICENSE.md` states that JUCE modules are dual-licensed under **AGPLv3 or the commercial JUCE license**. See the [upstream source and license](https://github.com/juce-framework/JUCE/blob/dabd5ad13cd869cba41046947fffc8e5ce5cd662/LICENSE.md), [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html), and [JUCE 8 license](https://juce.com/legal/juce-8-licence/).
 
-The build generates an adapted copy of JUCE's VST3 wrapper using `scripts/cmake/UndertowVST3InputGuard.cmake`. It discards incoming MIDI after conversion while preserving the input bus required by Ableton's instrument host contract. The pinned checkout remains unchanged and the generated copy retains JUCE's notices.
+The build generates an adapted copy of JUCE's VST3 wrapper using `plugin/scripts/cmake/UndertowVST3InputGuard.cmake`. It discards incoming MIDI after conversion while preserving the input bus required by Ableton's instrument host contract. The pinned checkout remains unchanged and the generated copy retains JUCE's notices.
 
 This project uses JUCE's **AGPLv3 licensing route**, alongside the AGPLv3-only license for SUBMOTIF's original code. A commercial JUCE license is not asserted or supplied here.
 
@@ -54,8 +54,8 @@ Research citations are provided in `docs/MUSIC_THEORY.md`. Reference-product gra
 
 ## Website utilities and typeface
 
-The static website includes layout and motion utilities from Leonxlnx's Taste Skill under the MIT license. The full notice is retained in `site/assets/LICENSE-taste-skill.txt`; its source is [the upstream license](https://github.com/Leonxlnx/taste-skill/blob/main/LICENSE). These utilities are separate from the SUBMOTIF generation algorithm.
+The static website includes layout and motion utilities from Leonxlnx's Taste Skill under the MIT license. The full notice is retained in `web/assets/LICENSE-taste-skill.txt`; its source is [the upstream license](https://github.com/Leonxlnx/taste-skill/blob/main/LICENSE). These utilities are separate from the SUBMOTIF generation algorithm.
 
-Host Grotesk is self-hosted under the SIL Open Font License 1.1. The supplied copyright and license are retained in `site/assets/fonts/OFL-Host-Grotesk.txt`.
+Host Grotesk is self-hosted under the SIL Open Font License 1.1. The supplied copyright and license are retained in `web/assets/fonts/OFL-Host-Grotesk.txt`.
 
 The plugin screenshots show this project's actual interface. The original audition candidates use freshly generated SUBMOTIF MIDI and project-generated bass/drums. The approved Acid showcase renders the selected pattern, raised by two octaves, through the owner's Serum 2 instrument and requested `TSP_S290V3_Bass_acid_sweep.SerumPreset`. Serum, its preset file, and its saved instrument state are not distributed. The instrument and preset remain subject to their separate licenses. Website playback is an audition aid, not a synthesizer supplied by the plugin.

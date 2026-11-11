@@ -3,7 +3,8 @@ set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # JUCE's nested build helpers must find the same CMake/Ninja executables.
-export PATH="$project_dir/.tools/venv/bin:$PATH"
+repo_dir="$(cd "$project_dir/.." && pwd)"
+export PATH="$repo_dir/.tools/venv/bin:$PATH"
 cmake_bin="$(command -v cmake || true)"
 ctest_bin="$(command -v ctest || true)"
 if [[ -z "$cmake_bin" || -z "$ctest_bin" ]]; then
@@ -38,7 +39,7 @@ fi
 
 if [[ "$core_only" == OFF ]]; then
     if ! command -v node >/dev/null 2>&1; then
-        echo "C++ checks passed. Node.js is required to run tests/max-tests.js." >&2
+        echo "C++ checks passed. Node.js is required to run plugin/tests/max-tests.js." >&2
         exit 1
     fi
     node "$project_dir/tests/max-tests.js"

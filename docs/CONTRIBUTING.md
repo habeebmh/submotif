@@ -26,15 +26,15 @@ Be kind and specific in issues and reviews. Discuss the work, respect contributo
 
 | Location | Responsibility |
 | --- | --- |
-| `Source/PatternEngine.*` | Portable C++ generation rules and pattern data. |
-| `Source/PluginProcessor.*` | VST3 state, MIDI playback, and export. |
-| `Source/PluginEditor.*` | Native editor. |
-| `max/undertow-core.js` | Matching JavaScript generation engine. |
-| `max/undertow.js`, `max/undertow-roll.js` | Max integration and piano roll. |
-| `max/build_device.py` | Generates the Max device and readable patch. |
-| `tests/` | Engine, host integration, Max, and cross-edition checks. |
+| `plugin/src/PatternEngine.*` | Portable C++ generation rules and pattern data. |
+| `plugin/src/PluginProcessor.*` | VST3 state, MIDI playback, and export. |
+| `plugin/src/PluginEditor.*` | Native editor. |
+| `plugin/max/undertow-core.js` | Matching JavaScript generation engine. |
+| `plugin/max/undertow.js`, `plugin/max/undertow-roll.js` | Max integration and piano roll. |
+| `plugin/max/build_device.py` | Generates the Max device and readable patch. |
+| `plugin/tests/` | Engine, host integration, Max, and cross-edition checks. |
 | `docs/MUSIC_THEORY.md` | Musical rationale and primary sources. |
-| `site/` | Landing page and its assets. |
+| `web/` | Landing page and its assets. |
 
 The C++ and JavaScript generators must stay in agreement. Musical changes usually need matching edits in both engines and a fixed-seed parity check. Preserve saved patterns, existing parameter identifiers, and MIDI export behavior unless a migration is explicitly part of the change.
 
@@ -45,24 +45,24 @@ For musical rules, cite relevant primary sources and explain which numerical cho
 Portable checks require CMake 3.22+, a C++17 compiler, Node.js, and Python 3. They do not require JUCE, Max, or a DAW:
 
 ```sh
-cmake -S . -B build-core -DUNDERTOW_CORE_ONLY=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build build-core --parallel
-ctest --test-dir build-core --output-on-failure
-node tests/max-tests.js
-python3 tests/generation-parity.py
+cmake -S plugin -B plugin/build-core -DUNDERTOW_CORE_ONLY=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build plugin/build-core --parallel
+ctest --test-dir plugin/build-core --output-on-failure
+node plugin/tests/max-tests.js
+python3 plugin/tests/generation-parity.py
 ```
 
-The parity script defaults to `clang++`; use `python3 tests/generation-parity.py --compiler g++` for GCC. It compiles its own temporary test adapter. GitHub's **Portable checks** job runs this group on Linux.
+The parity script defaults to `clang++`; use `python3 plugin/tests/generation-parity.py --compiler g++` for GCC. It compiles its own temporary test adapter. GitHub's **Portable checks** job runs this group on Linux.
 
 Native plug-in or editor changes also need an Apple Silicon macOS build, with Xcode Command Line Tools installed:
 
 ```sh
-./scripts/build-macos.sh
+./plugin/scripts/build-macos.sh
 ```
 
-This runs the native tests in addition to the Max and parity checks. For Max patch changes, regenerate the device with `python3 max/build_device.py` and include the corresponding generated files in the pull request.
+This runs the native tests in addition to the Max and parity checks. For Max patch changes, regenerate the device with `python3 plugin/max/build_device.py` and include the corresponding generated files in the pull request.
 
-When behavior depends on a DAW, test it in the actual host: loading, transport start/stop, MIDI routing, saving and reopening a session, and the affected export or clip workflow. Report the exact host and version. Automated tests cover only part of this; [validation notes](docs/VALIDATION.md) list known gaps. Do not label an untested host as supported.
+When behavior depends on a DAW, test it in the actual host: loading, transport start/stop, MIDI routing, saving and reopening a session, and the affected export or clip workflow. Report the exact host and version. Automated tests cover only part of this; [validation notes](VALIDATION.md) list known gaps. Do not label an untested host as supported.
 
 ## Keep contributions reviewable
 
@@ -74,4 +74,4 @@ Do not change generated files by hand when a generator exists. Avoid unrelated r
 
 By submitting an original contribution for inclusion, you license it under the **GNU Affero General Public License, version 3 only (`AGPL-3.0-only`)**, the same license as SUBMOTIF's original code. You retain your copyright. No separate contributor license agreement (CLA) or copyright assignment is required.
 
-AGPLv3 permits modifications, forks, and sales under its conditions; it is not a ban on commercial use or derivative works. Official SUBMOTIF downloads will be free, and contributing is optional. Do not submit material you do not have the right to contribute. Identify any third-party material and its compatible license. See [LICENSE](LICENSE), [the license guide](docs/legal/license-guide.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
+AGPLv3 permits modifications, forks, and sales under its conditions; it is not a ban on commercial use or derivative works. Official SUBMOTIF downloads will be free, and contributing is optional. Do not submit material you do not have the right to contribute. Identify any third-party material and its compatible license. See [LICENSE](../LICENSE), [the license guide](legal/license-guide.md), and [third-party notices](THIRD_PARTY_NOTICES.md).

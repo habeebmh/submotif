@@ -4,10 +4,10 @@ A dependency-free static page, with original product UI and a browser preview dr
 
 ## Preview
 
-Serve this folder over HTTP. For example, from the project root:
+Serve the `web/` folder over HTTP. For example, from the project root:
 
 ```sh
-python3 -m http.server 8080 --directory site
+python3 -m http.server 8080 --directory web
 ```
 
 Open `http://localhost:8080`. ES modules require an HTTP server; double-clicking the file will not provide the complete interactive preview.
@@ -17,6 +17,8 @@ Open `http://localhost:8080`. ES modules require an HTTP server; double-clicking
 This is the published Submotif preview, named under the owner's delegated naming request. Source is public at `https://github.com/habeebmh/submotif`. Firebase Hosting deployment completed on November 11, 2026 at `https://submotif.web.app`. The intended domain is `submotif.com`; it has not been purchased, and availability can change. The live Firebase Hosting origin is `https://submotif.web.app`; canonical and absolute social-image metadata use it. A custom domain is optional: the assigned `web.app` origin can host the preview while a custom domain is purchased and attached later. Public downloads remain on hold. The six-example showcase is enabled with the owner-approved Serum Acid recording two octaves higher. Do not present unresolved release or showcase status as completed.
 
 `robots.txt` disallows all crawling and `index.html` includes `noindex,nofollow`. Remove the blanket preview restriction only when publication is approved; keep `/review/` out of indexing. A custom `404.html` is included.
+
+Paths below are relative to `web/` unless a repository folder is named.
 
 Edit `assets/site-config.js`:
 
@@ -36,7 +38,7 @@ The live preview's synth is specific to the webpage; Submotif itself remains MID
 
 ## Assets and licensing
 
-- `assets/undertow-core.js` is copied without changes from `max/undertow-core.js`; re-copy after engine changes.
+- `assets/undertow-core.js` is copied without changes from `plugin/max/undertow-core.js`; re-copy after engine changes.
 - `assets/images/submotif-editor.png` and `submotif-editor-large.png` are actual native v1.2.2 Submotif captures, copied from `dist/ui-v1.2.2/`.
 - `share.jpg` is a rendered capture of the landing page hero.
 - Runtime layout/motion components are from `design-taste-frontend` 2.5.1 under `assets/LICENSE-taste-skill.txt`.

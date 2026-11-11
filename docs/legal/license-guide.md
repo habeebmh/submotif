@@ -18,7 +18,7 @@ Official SUBMOTIF releases will be free to download. Following the creator, payi
 
 ## Dependencies
 
-The VST3 build uses JUCE under its AGPLv3 option. No commercial JUCE license is asserted or supplied. JUCE's bundled components retain their respective notices, including the VST3 SDK's MIT license. See the [third-party notices](../../THIRD_PARTY_NOTICES.md) before redistributing a build.
+The VST3 build uses JUCE under its AGPLv3 option. No commercial JUCE license is asserted or supplied. JUCE's bundled components retain their respective notices, including the VST3 SDK's MIT license. See the [third-party notices](../THIRD_PARTY_NOTICES.md) before redistributing a build.
 
 Website utilities from Taste Skill retain their MIT license. Host Grotesk retains its SIL Open Font License. These licenses are not replaced by SUBMOTIF's original-code license.
 
@@ -28,7 +28,7 @@ The project claims no ownership of your generated MIDI or music and requires no 
 
 ## Contributions
 
-Contributors retain their copyright. Original contributions submitted for inclusion are licensed under the same AGPLv3-only terms. No separate contributor license agreement or copyright assignment is required. Contribute only material you have the right to license, identify third-party material, and preserve its required notices. See the [contribution guide](../../CONTRIBUTING.md) for the review process.
+Contributors retain their copyright. Original contributions submitted for inclusion are licensed under the same AGPLv3-only terms. No separate contributor license agreement or copyright assignment is required. Contribute only material you have the right to license, identify third-party material, and preserve its required notices. See the [contribution guide](../CONTRIBUTING.md) for the review process.
 
 ## Warranty and other website terms
 

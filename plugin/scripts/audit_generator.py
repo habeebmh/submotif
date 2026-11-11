@@ -19,7 +19,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 STYLES = ['deep', 'rolling', 'offbeat', 'acid', 'disco', 'funk']
-SOURCE_FILES = ['Source/PatternEngine.h', 'Source/PatternEngine.cpp', 'max/undertow-core.js']
+SOURCE_FILES = ['src/PatternEngine.h', 'src/PatternEngine.cpp', 'max/undertow-core.js']
 METRICS = {
     'notes_per_bar': 'Note count divided by phrase length in four-beat bars.',
     'empty_bar_pct': 'Percentage of all phrase bars containing no note onset.',
@@ -227,8 +227,8 @@ def main():
         cpp = Path(tmp) / 'dump.cpp'
         exe = Path(tmp) / 'dump'
         cpp.write_text(CPP_ADAPTER)
-        subprocess.run(['clang++', '-std=c++17', '-O2', '-I', str(ROOT / 'Source'), str(cpp),
-                        str(ROOT / 'Source/PatternEngine.cpp'), '-o', str(exe)], check=True)
+        subprocess.run(['clang++', '-std=c++17', '-O2', '-I', str(ROOT / 'src'), str(cpp),
+                        str(ROOT / 'src/PatternEngine.cpp'), '-o', str(exe)], check=True)
         raw_cpp = subprocess.run([str(exe), str(args.seeds), str(args.bars)], check=True, capture_output=True, text=True).stdout
     raw_js = subprocess.run(['node', '-e', JS_ADAPTER, str(ROOT / 'max/undertow-core.js'), str(args.seeds), str(args.bars)],
                             check=True, capture_output=True, text=True).stdout

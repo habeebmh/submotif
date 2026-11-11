@@ -48,12 +48,12 @@ Playback reads the host-linked Max transport's raw ticks every 2 ms, with note c
 Run the automated checks from the repository root:
 
 ```sh
-python3 max/build_device.py
-node tests/max-tests.js
+python3 plugin/max/build_device.py
+node plugin/tests/max-tests.js
 ```
 
 The suite checks musical constraints, procedural diversity, seed reproducibility, locks, MIDI file bytes/length, scheduler note cleanup, adapter state round-trip, safe clip targeting, pending-setting behavior, disclosure without state changes, presentation bounds and control overlap, and AMXD structure. It also compares the embedded AMXD patch with the readable source. Tests with a mocked Max/Live API do not substitute for loading and exercising the device in Ableton.
 
 The UI keeps the existing internal parameter names for saved sets and automation: Melody remains `Movement`, Note length remains `Gate`, and Register remains `Octave`. Action controls retain Max 9.1.3's Visible (Not Stored) mode so loading a project cannot invoke Generate, clip creation, or export.
 
-Implementation references: [device width with live.thisdevice](https://docs.cycling74.com/reference/live.thisdevice/), [native sliders](https://docs.cycling74.com/reference/live.slider/), [native action controls and inactive state](https://docs.cycling74.com/reference/live.text/), [Max transport](https://docs.cycling74.com/reference/transport/), [JavaScript LiveAPI](https://docs.cycling74.com/apiref/js/liveapi/), [ClipSlot create_clip](https://docs.cycling74.com/apiref/lom/clipslot/), [Clip add_new_notes](https://docs.cycling74.com/apiref/lom/clip/), and [saving state with pattr](https://docs.cycling74.com/userguide/pattr/). Musical sources and the distinction between published findings and our authored style rules are in [MUSIC_THEORY.md](../docs/MUSIC_THEORY.md).
+Implementation references: [device width with live.thisdevice](https://docs.cycling74.com/reference/live.thisdevice/), [native sliders](https://docs.cycling74.com/reference/live.slider/), [native action controls and inactive state](https://docs.cycling74.com/reference/live.text/), [Max transport](https://docs.cycling74.com/reference/transport/), [JavaScript LiveAPI](https://docs.cycling74.com/apiref/js/liveapi/), [ClipSlot create_clip](https://docs.cycling74.com/apiref/lom/clipslot/), [Clip add_new_notes](https://docs.cycling74.com/apiref/lom/clip/), and [saving state with pattr](https://docs.cycling74.com/userguide/pattr/). Musical sources and the distinction between published findings and our authored style rules are in [MUSIC_THEORY.md](../../docs/MUSIC_THEORY.md).

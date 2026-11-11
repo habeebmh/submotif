@@ -1,14 +1,14 @@
 {
   "hosting": {
     "site": "submotif",
-    "public": "site",
+    "public": "web",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/.*/**",
       "**/node_modules/**",
       "shots/**",
-      "site/**",
+      "scripts/**",
       "**/*.md"
     ],
     "headers": [

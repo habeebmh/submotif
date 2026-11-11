@@ -1,6 +1,6 @@
 # GitHub repository setup
 
-The public repository is **[habeebmh/submotif](https://github.com/habeebmh/submotif)**. `scripts/setup-github.sh` configures an existing repository; it does not create one, authenticate, upload source, change visibility, merge pull requests, or publish releases.
+The public repository is **[habeebmh/submotif](https://github.com/habeebmh/submotif)**. `.github/scripts/setup-github.sh` configures an existing repository; it does not create one, authenticate, upload source, change visibility, merge pull requests, or publish releases.
 
 ## Verified current setup
 
@@ -16,13 +16,13 @@ On November 11, 2026, main-branch protection was applied and read back successfu
 Preview the exact changes:
 
 ```sh
-./scripts/setup-github.sh
+./.github/scripts/setup-github.sh
 ```
 
 Apply them after reviewing the plan:
 
 ```sh
-./scripts/setup-github.sh --apply
+./.github/scripts/setup-github.sh --apply
 ```
 
 The default is read-only. Both modes verify the account, repository ownership, public visibility, current `main` commit, committed CODEOWNERS validity, and a successful run of the actual CI workflow. Missing `main`, missing or failing CI, unexpected protection fields, and conflicting rules stop setup before writes.

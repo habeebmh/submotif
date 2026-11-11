@@ -1,10 +1,10 @@
 # Interpreting the generator audit
 
-`scripts/audit_generator.py` reports descriptive measurements of generated MIDI. It does not calculate a musical-quality score. Run it with a fresh output folder, for example:
+`plugin/scripts/audit_generator.py` reports descriptive measurements of generated MIDI. It does not calculate a musical-quality score. Run it with a fresh output folder, for example:
 
 ```sh
-python3 scripts/audit_generator.py --output /tmp/undertow-audit --seeds 256
-python3 scripts/audit_generator.py --output /tmp/undertow-audit-four-bars --seeds 32 --bars 4
+python3 plugin/scripts/audit_generator.py --output /tmp/undertow-audit --seeds 256
+python3 plugin/scripts/audit_generator.py --output /tmp/undertow-audit-four-bars --seeds 32 --bars 4
 ```
 
 `--bars` accepts 2, 4, or 8; the default remains 2. The existing recorded baseline is two bars. Compare like lengths, controls, and seed counts. Adapter settings are explicit, so a later change to product defaults cannot silently change the audit condition. Saved generator source and its hashes identify what produced each corpus.
@@ -31,4 +31,4 @@ These numbers describe the sampled outputs. They neither estimate the total poss
 
 ## Verification
 
-`python3 tests/audit-tests.py` checks the metric semantics with small explicit fixtures. The extension was also checked against all 6,144 immutable baseline corpus rows: every pre-existing metric value remained unchanged. Separate 2/4/8-bar runs using the saved baseline C++ and Max sources produced the requested lengths; the default two-bar corpus matched the original records for the same tested seeds. Baseline artifacts were not rewritten.
+`python3 plugin/tests/audit-tests.py` checks the metric semantics with small explicit fixtures. The extension was also checked against all 6,144 immutable baseline corpus rows: every pre-existing metric value remained unchanged. Separate 2/4/8-bar runs using the saved baseline C++ and Max sources produced the requested lengths; the default two-bar corpus matched the original records for the same tested seeds. Baseline artifacts were not rewritten.

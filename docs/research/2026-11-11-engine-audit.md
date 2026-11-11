@@ -11,10 +11,10 @@ No product generation code was edited for this audit. Release packaging remains 
 Run from the project root:
 
 ```sh
-python3 scripts/audit_generator.py --output docs/research/engine-after-NEW-DATE
+python3 plugin/scripts/audit_generator.py --output docs/research/engine-after-NEW-DATE
 ```
 
-The helper compiles an isolated adapter against the actual C++ engine and loads the actual ES5 Max engine. It does not launch a DAW. The captured baseline is in [`engine-baseline-2026-11-11/`](engine-baseline-2026-11-11/):
+The helper compiles an isolated adapter against the actual C++ engine and loads the actual ES5 Max engine. It does not launch a DAW. The captured baseline is in [`engine-baseline-2026-11-11/`](engine-baseline-2026-11-11):
 
 - `manifest.json`: exact settings, seed formula, metric definitions, source/corpus SHA-256 hashes.
 - `corpus.jsonl.gz`: all original and one-step Variation note sequences.

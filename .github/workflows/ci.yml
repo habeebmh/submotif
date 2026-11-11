@@ -31,19 +31,19 @@ jobs:
           package-manager-cache: false
 
       - name: Configure portable engine
-        run: cmake -S . -B build-core -DUNDERTOW_CORE_ONLY=ON -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S plugin -B plugin/build-core -DUNDERTOW_CORE_ONLY=ON -DCMAKE_BUILD_TYPE=Release
 
       - name: Build portable engine
-        run: cmake --build build-core --parallel 2
+        run: cmake --build plugin/build-core --parallel 2
 
       - name: Test portable engine
-        run: ctest --test-dir build-core --output-on-failure
+        run: ctest --test-dir plugin/build-core --output-on-failure
 
       - name: Test Max engine and integration logic
-        run: node tests/max-tests.js
+        run: node plugin/tests/max-tests.js
 
       - name: Compare both generation engines
-        run: python3 tests/generation-parity.py --compiler g++
+        run: python3 plugin/tests/generation-parity.py --compiler g++
 
       - name: Validate repository setup requests
-        run: python3 -B tests/setup-github-tests.py
+        run: python3 -B .github/tests/setup-github-tests.py

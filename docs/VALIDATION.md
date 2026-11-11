@@ -6,7 +6,7 @@ Development validation recorded on November 11, 2026 (UTC) on Apple Silicon (M2 
 
 ## 1.2.2 Submotif rename
 
-- Both editions now display **SUBMOTIF**, manufacturer **Habeeb**. Build outputs are `Submotif.vst3` and `max/Submotif.amxd`.
+- Both editions now display **SUBMOTIF**, manufacturer **Habeeb**. Build outputs are `Submotif.vst3` and `plugin/max/Submotif.amxd`.
 - Persistent VST3 component/controller IDs, bundle ID, state schema, and the exact musical-core source hashes are unchanged. Internal `Undertow` target/source identifiers remain for compatibility.
 - The renamed build passes all four CTest suites, 32 Max groups, and 1,260-pattern cross-edition parity. The native editor run passes 1,691 checks; actual screenshots are in `dist/ui-v1.2.2/`.
 - VST3 and standalone development signatures verify. This build has not been installed or retested in Live; the historical observations and remaining host checks below still apply.
@@ -30,7 +30,7 @@ Development validation recorded on November 11, 2026 (UTC) on Apple Silicon (M2 
 - All 32 Max groups and the 1,260-pattern cross-edition comparison passed after the UI/default changes. Mocked Max APIs do not establish host rendering correctness.
 - Ableton host testing exposed a bus-contract issue inherited from 1.1: Live requires an event input bus for an instrument-category VST3. The final 1.2 build advertises that bus and discards all incoming MIDI. A generated JUCE wrapper guard clears input after conversion, including zero-audio parameter flushes and the suspended path, without modifying the pinned dependency. The native VST3 harness loads the actual bundle and verifies bus activation, generated output, rejection of external note/expression events, disabled output and zero-audio flush. Processor tests separately compare fed and clean output through active, disabled, bypassed and stopped cases.
 - Final 1.2 pluginval strictness 5 passes (`dist/validation-v1.2-final/`), after the bus repair. The build and installed copy both pass strict/deep ad-hoc signature checks and have the same binary hash.
-- The complete `scripts/build-macos.sh` run passes all four native suites, all 32 Max groups and the 1,260-pattern parity comparison. No release packaging was run.
+- The complete `plugin/scripts/build-macos.sh` run passes all four native suites, all 32 Max groups and the 1,260-pattern parity comparison. No release packaging was run.
 - In the actual validation Set, the redesigned Max device displayed and generated a one-bar phrase, retained its previously saved Register 2/Funk settings, and expanded its width through More controls. That inspection found a blank advanced area. A redundant foreground panel was identified as the likely occluder, removed, and AMXD rebuilt; the visual effect of this fix still needs host confirmation. Final visual confirmation of those controls, a fresh-instance default check in Live, and loading the final repaired VST3 remain pending.
 
 ## Earlier 1.1 automated checks
@@ -45,7 +45,7 @@ Development validation recorded on November 11, 2026 (UTC) on Apple Silicon (M2 
 
 ## Musical revision checks
 
-- `scripts/build-macos.sh` completes the Release build, signs and verifies completed development bundles after manifest generation, passes both CTest suites, passes all 28 Max test groups, and passes `tests/generation-parity.py`.
+- `plugin/scripts/build-macos.sh` completes the Release build, signs and verifies completed development bundles after manifest generation, passes both CTest suites, passes all 28 Max test groups, and passes `plugin/tests/generation-parity.py`.
 - The parity test compares 1,260 actual C++/Max outputs over 180 scenarios across six styles/five scales. It includes Generate, three consecutive Variations, regeneration with locks, changed settings, and off-grid/extreme-pitch locks. Counts, pitches, velocities, locks and seeds match exactly; onset/duration differences are at most 1e-12 beat. Unit controls are rounded to the C++ float boundary for generation only; saved values are not quantized to percentages.
 - Independent review exercised 40,000 arbitrary-lock/Variation cases and 600 restricted-JavaScript-runtime generation/export cases. The final portable engine also passed address/undefined-behavior sanitizers. These checks do not replace host testing.
 - The revised structural audit covers 9,216 base phrases plus one Variation each: 6,144 matched two-bar cases, 1,536 four-bar cases and 1,536 eight-bar cases. [Measured changes](research/2026-11-11-revision-results.md) report repetition, register, connector resolution and density without a subjective quality score.

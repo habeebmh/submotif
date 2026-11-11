@@ -1,6 +1,6 @@
 # Submotif website and publication
 
-The static product site is in `site/`. It has no package install or build step. For a local preview, run `python3 -m http.server 8080 --directory site --bind 127.0.0.1` and open `http://127.0.0.1:8080/`.
+The static product site is in `web/`. It has no package install or build step. For a local preview, run `python3 -m http.server 8080 --directory web --bind 127.0.0.1` and open `http://127.0.0.1:8080/`.
 
 - Product: **SUBMOTIF**, by Habeeb. Intended custom domain: **submotif.com**.
 - Public source destination: [habeebmh/submotif](https://github.com/habeebmh/submotif).
@@ -17,7 +17,7 @@ The selected examples page is `/selected-examples.html`. Acid uses the owner's r
 
 ## Hosting
 
-`firebase.json` deploys only `site/` to the named Hosting site `submotif`. `.firebaserc` points to the newly created backing project `lowweave`; that internal ID predates the final product rename. The public address uses only Submotif. No Analytics, authentication, database, Functions, billing upgrade, or private credential belongs in this setup.
+`firebase.json` deploys only `web/` to the named Hosting site `submotif`. `.firebaserc` points to the newly created backing project `lowweave`; that internal ID predates the final product rename. The public address uses only Submotif. No Analytics, authentication, database, Functions, billing upgrade, or private credential belongs in this setup.
 
 The deployment excludes hidden files and their descendants (`**/.*` and `**/.*/**`), browser profiles, screenshots, internal Markdown plans, and staging folders. The actual Firebase upload list was verified to contain 269 tracked public files and zero hidden or untracked files. Headers restrict framing, device permissions, cross-origin resources, and referrer information. The preview and listening pages remain excluded from search indexing pending launch.
 
@@ -27,14 +27,14 @@ Deploy only Hosting using the Firebase connector, or the official CLI:
 npx -y firebase-tools@latest deploy --only hosting --project lowweave
 ```
 
-After deploying, verify the live page, resource URLs, security headers, legal links, MIDI exports, playback, and disabled release state. A successful local build does not establish a successful deployment. Repository approval settings are described in [GITHUB_SETUP.md](GITHUB_SETUP.md); native/host testing limits are in [VALIDATION.md](VALIDATION.md). The website design and verification record is in `site/SITE.md`.
+After deploying, verify the live page, resource URLs, security headers, legal links, MIDI exports, playback, and disabled release state. A successful local build does not establish a successful deployment. Repository approval settings are described in [GITHUB_SETUP.md](GITHUB_SETUP.md); native/host testing limits are in [VALIDATION.md](VALIDATION.md). The website design and verification record is in `docs/WEBSITE.md`.
 
 ## Legal pages
 
-The source documents in `docs/legal/` render to `site/legal/` with:
+The source documents in `docs/legal/` render to `web/legal/` with:
 
 ```sh
-python3 scripts/build-legal-pages.py
+python3 web/scripts/build-legal-pages.py
 ```
 
 The renderer verifies the exact GNU AGPLv3 text and includes local copies of the license, notices, and contribution guide. Website terms do not narrow software license rights. No governing jurisdiction has been invented; these documents do not claim universal enforceability.

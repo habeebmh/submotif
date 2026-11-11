@@ -9,8 +9,8 @@ endif()
 
 option(UNDERTOW_CORE_ONLY "Build the portable engine tests without JUCE" OFF)
 enable_testing()
-add_library(UndertowCore STATIC Source/PatternEngine.cpp)
-target_include_directories(UndertowCore PUBLIC Source)
+add_library(UndertowCore STATIC src/PatternEngine.cpp)
+target_include_directories(UndertowCore PUBLIC src)
 add_executable(UndertowEngineTests tests/EngineTests.cpp)
 target_link_libraries(UndertowEngineTests PRIVATE UndertowCore)
 add_test(NAME engine COMMAND UndertowEngineTests)
@@ -18,7 +18,7 @@ if(UNDERTOW_CORE_ONLY)
     return()
 endif()
 
-set(JUCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.deps/JUCE" CACHE PATH "JUCE source location")
+set(JUCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.deps/JUCE" CACHE PATH "JUCE source location")
 if(NOT EXISTS "${JUCE_DIR}/CMakeLists.txt")
     include(FetchContent)
     FetchContent_Declare(JUCE GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
@@ -46,8 +46,8 @@ juce_add_plugin(Undertow
     VST3_CATEGORIES Instrument Tools
     NEEDS_WEB_BROWSER FALSE
     NEEDS_CURL FALSE)
-target_sources(Undertow PRIVATE Source/PluginProcessor.cpp Source/PluginEditor.cpp)
-target_include_directories(Undertow PUBLIC Source)
+target_sources(Undertow PRIVATE src/PluginProcessor.cpp src/PluginEditor.cpp)
+target_include_directories(Undertow PUBLIC src)
 target_compile_definitions(Undertow PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0 JUCE_VST3_EMULATE_MIDI_CC_WITH_PARAMETERS=0)
 target_link_libraries(Undertow PRIVATE UndertowCore juce::juce_audio_utils

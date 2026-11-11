@@ -16,7 +16,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = [ROOT / 'Source/PatternEngine.cpp', ROOT / 'Source/PatternEngine.h',
+SOURCES = [ROOT / 'src/PatternEngine.cpp', ROOT / 'src/PatternEngine.h',
            ROOT / 'max/undertow-core.js']
 
 CPP = r'''
@@ -160,8 +160,8 @@ def main():
     with tempfile.TemporaryDirectory(prefix='undertow-parity-') as temporary:
         cpp=Path(temporary)/'adapter.cpp'; exe=Path(temporary)/'adapter'
         cpp.write_text(CPP)
-        subprocess.run([args.compiler,'-std=c++17','-O2','-I',str(ROOT/'Source'),str(cpp),
-                        str(ROOT/'Source/PatternEngine.cpp'),'-o',str(exe)],check=True)
+        subprocess.run([args.compiler,'-std=c++17','-O2','-I',str(ROOT/'src'),str(cpp),
+                        str(ROOT/'src/PatternEngine.cpp'),'-o',str(exe)],check=True)
         cpp_result=subprocess.run([str(exe)],input='\n'.join(map(input_line,rows))+'\n',
                                   text=True,capture_output=True,check=True).stdout
     js_result=subprocess.run(['node','-e',JS,str(ROOT/'max/undertow-core.js')],

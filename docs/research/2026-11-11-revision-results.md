@@ -1,6 +1,6 @@
 # Musical phrasing revision: measured changes
 
-This is a structural comparison, not a musical-quality score. Listening examples are in [`../../dist/auditions-v1.1/`](../../dist/auditions-v1.1/). Each comparison alternates old and revised for three predetermined seeds, with identical bass synthesis, drums, tempo and one shared gain.
+This is a structural comparison, not a musical-quality score. Listening examples are in [`../../dist/auditions-v1.1/`](../../dist/auditions-v1.1). Each comparison alternates old and revised for three predetermined seeds, with identical bass synthesis, drums, tempo and one shared gain.
 
 ## Matched two-bar comparison
 

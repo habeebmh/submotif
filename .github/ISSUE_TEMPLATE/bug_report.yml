@@ -7,7 +7,7 @@ body:
       value: |
         Thanks for helping improve SUBMOTIF. Search existing issues first.
         Do not include private music, credentials, or personal information.
-        For security vulnerabilities, follow SECURITY.md instead of posting details here.
+        For security vulnerabilities, follow docs/SECURITY.md instead of posting details here.
   - type: input
     id: version
     attributes:

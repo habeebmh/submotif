@@ -18,11 +18,11 @@ import wave
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 STYLE_NAMES = [('deep', 'Deep House'), ('rolling', 'Rolling'), ('offbeat', 'Offbeat'),
                ('acid', 'Acid'), ('disco', 'Disco'), ('funk', 'Funk')]
-SOURCE_PATHS = ['Source/PatternEngine.cpp', 'Source/PatternEngine.h', 'max/undertow-core.js',
-                'scripts/render_showcase.py']
+SOURCE_PATHS = ['plugin/src/PatternEngine.cpp', 'plugin/src/PatternEngine.h', 'plugin/max/undertow-core.js',
+                'web/scripts/render_showcase.py']
 RATE, BPM, REPEATS = 44100, 126, 2
 SEED_NAMESPACE = 'UNDERTOW by Habeeb / showcase review 1 / '
 
@@ -100,11 +100,11 @@ def generate(rows):
     with tempfile.TemporaryDirectory(prefix='undertow-showcase-') as tmp:
         cpp, exe = Path(tmp) / 'adapter.cpp', Path(tmp) / 'adapter'
         cpp.write_text(CPP)
-        run(['clang++', '-std=c++17', '-O2', '-I', str(ROOT / 'Source'), str(cpp),
-             str(ROOT / 'Source/PatternEngine.cpp'), '-o', str(exe)])
+        run(['clang++', '-std=c++17', '-O2', '-I', str(ROOT / 'plugin/src'), str(cpp),
+             str(ROOT / 'plugin/src/PatternEngine.cpp'), '-o', str(exe)])
         raw = run([str(exe)], input='\n'.join(f"{r['id']} {r['style']} {r['seed']}" for r in rows) + '\n', text=True).stdout
     native = [json.loads(line) for line in raw.splitlines()]
-    max_rows = [json.loads(line) for line in run(['node', '-e', JS, str(ROOT / 'max/undertow-core.js')],
+    max_rows = [json.loads(line) for line in run(['node', '-e', JS, str(ROOT / 'plugin/max/undertow-core.js')],
                 input=json.dumps(rows), text=True).stdout.splitlines()]
     assert len(native) == len(max_rows) == 60
     for source, cpp_row, max_row in zip(rows, native, max_rows):
@@ -215,7 +215,7 @@ def encode(pair):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / 'dist/showcase-candidates')
-    parser.add_argument('--review', type=Path, default=ROOT / 'site/review')
+    parser.add_argument('--review', type=Path, default=ROOT / 'web/review')
     args = parser.parse_args()
     before = source_hashes()
     rows = generate(candidates())
@@ -285,7 +285,7 @@ def main():
     # A local script also makes the reviewer usable when opened directly from disk.
     (review / 'candidates.js').write_text('window.UNDERTOW_AUDITIONS = ' + json.dumps(metadata) + ';\n')
     guide = ['# UNDERTOW: 60 candidates for approval', '',
-             'Choose one candidate per style in `site/review/index.html`. Nothing is selected or approved by default.', '',
+             'Choose one candidate per style in `web/review/index.html`. Nothing is selected or approved by default.', '',
              'Each candidate is a fresh call to the current C++ weighted generator, checked against the Max generator.',
              'All examples: C natural minor, C1 base, two bars, 126 BPM, played twice. Plugin defaults remain one bar.',
              'Identical original offline bass/drum patch and shared gain keep the comparison consistent. No artist audio or third-party samples.',

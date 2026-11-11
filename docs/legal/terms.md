@@ -18,7 +18,7 @@ After release review, official builds will be offered through the GitHub Release
 
 ## Contributions and community
 
-Issues and pull requests are welcome through the project repository once it is public. Follow the [contribution guide](../../CONTRIBUTING.md) and submit only material you have the right to share. Contributors retain their copyright and license original contributions under AGPLv3-only; no separate contributor license agreement or copyright assignment is required. Submitting a contribution does not guarantee acceptance, payment, support, or a release date. Do not post credentials, private session material, personal information, or someone else's unlicensed recordings in public reports.
+Issues and pull requests are welcome through the project repository once it is public. Follow the [contribution guide](../CONTRIBUTING.md) and submit only material you have the right to share. Contributors retain their copyright and license original contributions under AGPLv3-only; no separate contributor license agreement or copyright assignment is required. Submitting a contribution does not guarantee acceptance, payment, support, or a release date. Do not post credentials, private session material, personal information, or someone else's unlicensed recordings in public reports.
 
 ## Project identity and third parties
 
