@@ -52,7 +52,19 @@ def api(endpoint, method='GET', payload=None, missing_ok=False):
         if missing_ok and status and status.group(1) == '404':
             return None
         detail = 'HTTP ' + status.group(1) if status else 'authentication, network, or CLI error'
-        raise SetupError('GitHub request failed (' + detail + '): ' + method + ' ' + endpoint)
+        # Report the API's validation reason, never raw CLI stderr/debug output.
+        try:
+            body = json.loads(result.stdout)
+            message = body.get('message', '') if isinstance(body, dict) else ''
+        except json.JSONDecodeError:
+            message = ''
+        if not isinstance(message, str):
+            message = ''
+        message = re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)\b|\bBearer\s+\S+',
+                         '[REDACTED]', message, flags=re.IGNORECASE)
+        message = re.sub(r'[\x00-\x1f\x7f-\x9f]+', ' ', message).strip()[:1200]
+        raise SetupError('GitHub request failed (' + detail + '): ' + method + ' ' + endpoint
+                         + (': ' + message if message else ''))
     try:
         return json.loads(result.stdout) if result.stdout.strip() else None
     except json.JSONDecodeError:
@@ -109,7 +121,8 @@ def normalize_protection(raw):
             # REST accepts -1, not null, when any app may supply an existing check.
             if check.get('app_id') is None:
                 check['app_id'] = -1
-        status = {'strict': status.get('strict', False), 'contexts': [],
+        # PUT accepts either legacy contexts or app-bound checks, never both.
+        status = {'strict': status.get('strict', False),
                   'checks': sorted(checks, key=lambda check: (check['context'], check['app_id']))}
     result = {'required_status_checks': status, 'enforce_admins': enabled(raw, 'enforce_admins'),
               'required_pull_request_reviews': reviews, 'restrictions': None}
@@ -201,7 +214,7 @@ def desired_protection(current, app_id):
     reviews.update(dismiss_stale_reviews=True, require_code_owner_reviews=True,
                    required_approving_review_count=max(1, reviews.get('required_approving_review_count', 0)))
     desired['required_pull_request_reviews'] = reviews
-    status = desired['required_status_checks'] or {'contexts': [], 'checks': []}
+    status = desired['required_status_checks'] or {'checks': []}
     existing = [check for check in status['checks'] if check['context'] == CHECK]
     require(all(check['app_id'] in (app_id, -1) for check in existing),
             'Portable checks is already bound to a different application; review manually.')

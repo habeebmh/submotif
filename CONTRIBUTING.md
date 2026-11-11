@@ -18,7 +18,7 @@ Report security vulnerabilities through the [security policy](SECURITY.md), rath
 2. Make the change and update affected instructions or tests.
 3. Run the relevant checks below. State which host checks you completed and which you could not run.
 4. Open a pull request against `main`. Explain the problem, the resulting behavior, and the evidence that it works. Add screenshots for visible changes and before/after MIDI or audio examples for musical changes when useful.
-5. Respond to review and keep changes focused. The intended merge policy requires approval from **@habeebmh**. A passing check alone does not approve a change.
+5. Respond to review and keep changes focused. Community pull requests require approval from **@habeebmh**. A passing check alone does not approve a change.
 
 Be kind and specific in issues and reviews. Discuss the work, respect contributors' time, and avoid personal attacks or harassment. There is no guaranteed review or release schedule.
 

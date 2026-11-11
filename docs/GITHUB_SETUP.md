@@ -2,6 +2,10 @@
 
 The public repository is **[habeebmh/submotif](https://github.com/habeebmh/submotif)**. `scripts/setup-github.sh` configures an existing repository; it does not create one, authenticate, upload source, change visibility, merge pull requests, or publish releases.
 
+## Verified current setup
+
+On November 11, 2026, main-branch protection was applied and read back successfully after Portable checks passed on the published source. Community PRs require one approving Code Owner review from `@habeebmh`, passing up-to-date Portable checks, and resolved conversations. Stale approvals are dismissed; force pushes and branch deletion are disabled. Issues and private vulnerability reporting are enabled. Owner/admin bypass remains available as explained below. The repository remains open to forks and pull requests.
+
 ## Before applying settings
 
 1. Resolve the project license and finish the public-source review. Create the public repository under `habeebmh` and publish the reviewed initial source to `main` separately.

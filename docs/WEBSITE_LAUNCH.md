@@ -4,7 +4,7 @@ The static product site is in `site/`. It has no package install or build step. 
 
 - Product: **SUBMOTIF**, by Habeeb. Intended custom domain: **submotif.com**.
 - Public source destination: [habeebmh/submotif](https://github.com/habeebmh/submotif).
-- Firebase site: [submotif.web.app](https://submotif.web.app).
+- Published Firebase preview: [submotif.web.app](https://submotif.web.app). Deployment completed November 11, 2026.
 - Original software license: **AGPL-3.0-only**. Official downloads will be free; forks, changes, and sales remain permitted under the license's conditions.
 - Release packaging and publication remain **on hold for review**. No release archive has been generated for version 1.2.2. `releaseReady: false` keeps the download action disabled; its eventual destination is always [GitHub's latest release](https://github.com/habeebmh/submotif/releases/latest).
 - The optional [Instagram follow](https://www.instagram.com/habeeeeeeeeeeeeeeeb/) is a thank-you, never an access requirement.
@@ -19,7 +19,7 @@ The selected examples page is `/selected-examples.html`. Acid uses the owner's r
 
 `firebase.json` deploys only `site/` to the named Hosting site `submotif`. `.firebaserc` points to the newly created backing project `lowweave`; that internal ID predates the final product rename. The public address uses only Submotif. No Analytics, authentication, database, Functions, billing upgrade, or private credential belongs in this setup.
 
-The deployment excludes hidden files, browser profiles, screenshots, internal Markdown plans, and staging folders. Headers restrict framing, device permissions, cross-origin resources, and referrer information. The preview and listening pages remain excluded from search indexing pending launch.
+The deployment excludes hidden files and their descendants (`**/.*` and `**/.*/**`), browser profiles, screenshots, internal Markdown plans, and staging folders. The actual Firebase upload list was verified to contain 269 tracked public files and zero hidden or untracked files. Headers restrict framing, device permissions, cross-origin resources, and referrer information. The preview and listening pages remain excluded from search indexing pending launch.
 
 Deploy only Hosting using the Firebase connector, or the official CLI:
 

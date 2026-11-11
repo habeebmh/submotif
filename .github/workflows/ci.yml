@@ -44,3 +44,6 @@ jobs:
 
       - name: Compare both generation engines
         run: python3 tests/generation-parity.py --compiler g++
+
+      - name: Validate repository setup requests
+        run: python3 -B tests/setup-github-tests.py
