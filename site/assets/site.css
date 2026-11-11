@@ -62,3 +62,6 @@
 @media(max-width:639px){.hero.hero--centred .hero__window > img.hero-editor{object-position:0 36%}}
 
 .showcase-roll{display:block;width:100%;height:56px;background:#1b2420;border-radius:5px;margin-bottom:12px}
+@media(min-width:640px) and (max-width:1023px){#showcase{--h:1}}
+@media(max-width:639px){#showcase .section-head{margin-bottom:24px}#showcase .section-head h2{font-size:28px}#showcase .section-head p{font-size:14px}.showcase-list{gap:12px}.showcase-example{padding:12px}.showcase-roll{height:32px;margin-bottom:8px}}
+@media(max-width:639px){.showcase-example p{margin-bottom:4px}}
