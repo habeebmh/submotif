@@ -19,11 +19,18 @@
  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopShowcase()});
  window.addEventListener('pagehide',stopShowcase);
  function showcaseRoll(pattern,style){
-  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 320 64');svg.classList.add('showcase-roll');svg.setAttribute('role','img');svg.setAttribute('aria-label',`${style}: ${pattern.notes.length} exact selected MIDI notes`);
+  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 640 240');svg.setAttribute('preserveAspectRatio','none');svg.classList.add('showcase-roll');svg.setAttribute('role','img');svg.setAttribute('aria-label',`${style}: ${pattern.notes.length} approved MIDI notes; pitch above, velocity below`);
   const add=(tag,attrs)=>{const el=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));svg.append(el)};
-  for(let i=0;i<=32;i++)add('line',{x1:i*10,y1:0,x2:i*10,y2:64,stroke:i%4?'#28322e':'#3f4c43','stroke-width':'.5'});
-  const low=Math.min(...pattern.notes.map(n=>n.pitch))-1,high=Math.max(...pattern.notes.map(n=>n.pitch))+1;
-  pattern.notes.forEach(n=>add('rect',{x:n.start/pattern.lengthBeats*320,y:6+(high-n.pitch)/(high-low)*46,width:Math.max(1.5,n.duration/pattern.lengthBeats*320),height:4,rx:1,fill:'#b9dd65'}));return svg;
+  const low=Math.min(...pattern.notes.map(n=>n.pitch))-1,high=Math.max(...pattern.notes.map(n=>n.pitch))+1,rows=high-low+1,rowHeight=188/rows;
+  for(let row=0;row<=rows;row++)add('line',{x1:0,y1:8+row*rowHeight,x2:640,y2:8+row*rowHeight,stroke:'#28322e','stroke-width':'.6'});
+  for(let step=0;step<=32;step++)add('line',{x1:step*20,y1:0,x2:step*20,y2:240,stroke:step%16===0?'#6a7b6c':step%4===0?'#3f4c43':'#28322e','stroke-width':step%16===0?'1':'.6'});
+  add('line',{x1:0,y1:208,x2:640,y2:208,stroke:'#3f4c43','stroke-width':'1'});
+  pattern.notes.forEach(n=>{
+   const x=n.start/pattern.lengthBeats*640,w=n.duration/pattern.lengthBeats*640;
+   add('rect',{x,y:9+(high-n.pitch)*rowHeight,width:w,height:Math.max(2,rowHeight-2),rx:2,fill:'#b9dd65','fill-opacity':(.5+n.velocity/254).toFixed(3),'data-midi-note':n.pitch});
+   const velocityHeight=n.velocity/127*22;
+   add('rect',{x,y:236-velocityHeight,width:3,height:velocityHeight,rx:1,fill:'#b9dd65','fill-opacity':'.55'});
+  });return svg;
  }
  // Only a complete owner-approved six-style set becomes a public showcase.
  async function buildShowcase(){
@@ -57,19 +64,20 @@
    }
   }catch{return}
   const list=document.querySelector('#showcase-list');
-  const windowEl=document.createElement('div'),choices=document.createElement('div'),detail=document.createElement('div'),heading=document.createElement('div'),title=document.createElement('p'),meta=document.createElement('p'),player=document.createElement('audio'),download=document.createElement('a');
-  windowEl.className='recording-window app-frame ui';choices.className='recording-choices';choices.setAttribute('role','group');choices.setAttribute('aria-label','Selected bassline recording');detail.className='recording-detail';heading.className='recording-head';title.className='recording-title';
-  const text=document.createElement('div');text.append(title,meta);heading.append(text);player.controls=true;player.preload='none';download.className='link';download.textContent='Save this MIDI';
+  const windowEl=document.createElement('div'),choices=document.querySelector('#showcase-choices'),detail=document.createElement('div'),heading=document.createElement('div'),title=document.createElement('p'),meta=document.createElement('p'),player=document.createElement('audio'),download=document.createElement('a'),wave=document.querySelector('#recording-wave');
+  windowEl.className='recording-window app-frame ui ui-recordings';choices.className='recording-choices';choices.setAttribute('role','group');choices.setAttribute('aria-label','Selected bassline recording');detail.className='recording-detail';heading.className='recording-head';title.className='recording-title';
+  const text=document.createElement('div');text.append(title,meta);heading.append(text);player.controls=true;player.preload='none';download.className='link';download.textContent='Save this MIDI';wave.className='recording-wave';wave.loading='lazy';wave.width=640;wave.height=64;
   let currentRoll;
   function selectRecording(style){
    player.pause();const item=featured.get(style);title.textContent=names[style];meta.textContent=`C minor · 2 bars · 126 BPM${item.transpose?` · ${item.transpose>0?'+':''}${item.transpose/12} ${Math.abs(item.transpose)===12?'octave':'octaves'}`:''}`;
    player.src=item.audio;player.setAttribute('aria-label',names[style]+' bassline');player.load();download.href=item.midi;download.download=`Submotif-${item.variantId}.mid`;
-   const next=showcaseRoll(item.pattern,names[style]);if(currentRoll)currentRoll.replaceWith(next);else detail.insertBefore(next,player);currentRoll=next;
+   wave.src=`assets/graphics/${item.id.split('-')[0]}-wave.svg`;wave.alt=`${names[style]} approved recording waveform`;
+   const next=showcaseRoll(item.pattern,names[style]);if(currentRoll)currentRoll.replaceWith(next);else detail.insertBefore(next,wave);currentRoll=next;
    choices.querySelectorAll('button').forEach((button,index)=>button.setAttribute('aria-pressed',String(index===style)));
   }
-  for(let style=0;style<6;style++){const button=document.createElement('button');button.type='button';button.textContent=names[style];button.addEventListener('click',()=>selectRecording(style));choices.append(button)}
+  choices.querySelectorAll('button').forEach((button,style)=>button.addEventListener('click',()=>selectRecording(style)));
   player.addEventListener('play',()=>{if(document.hidden)player.pause()});showcasePlayers.push(player);
-  detail.append(heading,player,download);windowEl.append(choices,detail);list.append(windowEl);selectRecording(0);
+  detail.append(heading,wave,player,download);windowEl.append(choices,detail);list.append(windowEl);selectRecording(0);
   document.querySelector('#showcase').hidden=false;
  }
  buildShowcase();
