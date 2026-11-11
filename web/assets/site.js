@@ -24,7 +24,7 @@
   for(const n of pattern.notes){const el=document.createElement('span');el.className='note';el.style.left=`${n.start/pattern.lengthBeats*100}%`;el.style.width=`${Math.max(.3,n.duration/pattern.lengthBeats*100)}%`;el.style.top=`${12+(high-n.pitch)/(high-low)*76}%`;el.title=`MIDI note ${n.pitch}, beat ${(n.start+1).toFixed(2)}`;roll.append(el)}
   document.querySelector('#pattern-label').textContent=names[settings.style];document.querySelector('#note-count').textContent=`${pattern.notes.length} notes`;document.querySelector('#style-description').textContent=descriptions[settings.style];document.querySelector('.generator__meta').textContent=`C minor / ${pattern.lengthBeats/4} ${pattern.lengthBeats===4?'bar':'bars'} / 126 BPM`;document.querySelector('.generator__status').textContent='Browser preview';document.querySelector('#piano-roll').setAttribute('aria-label',`${names[settings.style]} bassline in C minor with ${pattern.notes.length} MIDI notes`)
  }
- function stop(){playbackGeneration++;pendingStart=false;playing=false;clearTimeout(timer);cancelAnimationFrame(frame);nodes.forEach(n=>{try{n.stop()}catch{}});nodes=[];play.textContent='Play preview';play.removeAttribute('aria-busy');play.setAttribute('aria-pressed','false');head.hidden=true}
+ function stop(){playbackGeneration++;pendingStart=false;playing=false;clearTimeout(timer);cancelAnimationFrame(frame);nodes.forEach(n=>{try{n.stop()}catch{}});nodes=[];play.textContent='Play';play.setAttribute('aria-label','Play preview');play.removeAttribute('aria-busy');play.setAttribute('aria-pressed','false');head.hidden=true}
  function generate(){stopShowcase();stop();pattern=C.generate(settings,seed(),null,false);if(!C.valid(pattern))throw new Error('Invalid generator output');draw();message.textContent=`Generated ${names[settings.style]} with ${pattern.notes.length} notes.`}
  function note(n,at){
   const duration=n.duration*60/126,osc=audio.createOscillator(),sub=audio.createOscillator(),gain=audio.createGain(),filter=audio.createBiquadFilter();
@@ -35,12 +35,12 @@
  }
  async function preview(){
   if(playing||pendingStart){stop();return}
-  stopShowcase();const token=++playbackGeneration;pendingStart=true;play.textContent='Starting audio';play.setAttribute('aria-busy','true');
+  stopShowcase();const token=++playbackGeneration;pendingStart=true;play.textContent='Starting…';play.setAttribute('aria-busy','true');
   try{
    audio||=(new (window.AudioContext||window.webkitAudioContext)());if(!master){master=audio.createGain();master.gain.value=.65;master.connect(audio.destination)}
    await audio.resume();
    if(token!==playbackGeneration||document.hidden){if(token===playbackGeneration)stop();return}
-   pendingStart=false;playing=true;play.removeAttribute('aria-busy');play.textContent='Stop preview';play.setAttribute('aria-pressed','true');startAt=audio.currentTime+.04;const bar=pattern.lengthBeats*60/126;
+   pendingStart=false;playing=true;play.removeAttribute('aria-busy');play.textContent='Stop';play.setAttribute('aria-label','Stop preview');play.setAttribute('aria-pressed','true');startAt=audio.currentTime+.04;const bar=pattern.lengthBeats*60/126;
    for(let repeat=0;repeat<4;repeat++)pattern.notes.forEach(n=>note(n,startAt+repeat*bar+n.start*60/126));head.hidden=false;
    const tick=()=>{if(!playing)return;const progress=Math.max(0,audio.currentTime-startAt)%bar/bar;head.style.left=`${progress*100}%`;frame=requestAnimationFrame(tick)};tick();timer=setTimeout(stop,(bar*4+.2)*1000)
   }catch(e){if(token!==playbackGeneration)return;stop();message.textContent='Audio could not start. Try Play preview again.'}
@@ -88,12 +88,19 @@
    }
   }catch{return}
   const list=document.querySelector('#showcase-list');
-  for(let style=0;style<6;style++){
-   const item=featured.get(style),card=document.createElement('article'),title=document.createElement('h3'),details=document.createElement('p'),player=document.createElement('audio'),download=document.createElement('a');
-   card.className='showcase-example ui ui-showcase';title.textContent=names[style];details.textContent=`C minor · ${item.pattern.lengthBeats/4} bars · 126 BPM${item.transpose?` · ${item.transpose>0?'+':''}${item.transpose/12} ${Math.abs(item.transpose)===12?'octave':'octaves'}`:''}`;player.controls=true;player.preload='none';player.src=item.audio;player.setAttribute('aria-label',`${names[style]} bassline`);
-   download.href=item.midi;download.download=`Submotif-${names[style].toLowerCase().replaceAll(' ','-')}-${item.variantId}.mid`;download.textContent='Save this MIDI';download.className='link';
-   player.addEventListener('play',()=>{stop();showcasePlayers.forEach(other=>{if(other!==player)other.pause()});if(document.hidden)player.pause()});showcasePlayers.push(player);card.append(title,details,showcaseRoll(item.pattern,names[style]),player,download);list.append(card);
+  const windowEl=document.createElement('div'),choices=document.createElement('div'),detail=document.createElement('div'),heading=document.createElement('div'),title=document.createElement('p'),meta=document.createElement('p'),player=document.createElement('audio'),download=document.createElement('a');
+  windowEl.className='recording-window app-frame ui';choices.className='recording-choices';choices.setAttribute('role','group');choices.setAttribute('aria-label','Selected bassline recording');detail.className='recording-detail';heading.className='recording-head';title.className='recording-title';
+  const text=document.createElement('div');text.append(title,meta);heading.append(text);player.controls=true;player.preload='none';download.className='link';download.textContent='Save this MIDI';
+  let currentRoll;
+  function selectRecording(style){
+   player.pause();const item=featured.get(style);title.textContent=names[style];meta.textContent=`C minor · 2 bars · 126 BPM${item.transpose?` · ${item.transpose>0?'+':''}${item.transpose/12} ${Math.abs(item.transpose)===12?'octave':'octaves'}`:''}`;
+   player.src=item.audio;player.setAttribute('aria-label',names[style]+' bassline');player.load();download.href=item.midi;download.download=`Submotif-${item.variantId}.mid`;
+   const next=showcaseRoll(item.pattern,names[style]);if(currentRoll)currentRoll.replaceWith(next);else detail.insertBefore(next,player);currentRoll=next;
+   choices.querySelectorAll('button').forEach((button,index)=>button.setAttribute('aria-pressed',String(index===style)));
   }
+  for(let style=0;style<6;style++){const button=document.createElement('button');button.type='button';button.textContent=names[style];button.addEventListener('click',()=>selectRecording(style));choices.append(button)}
+  player.addEventListener('play',()=>{stop();if(document.hidden)player.pause()});showcasePlayers.push(player);
+  detail.append(heading,player,download);windowEl.append(choices,detail);list.append(windowEl);selectRecording(0);
   document.querySelector('#showcase').hidden=false;
  }
  buildShowcase();generate();

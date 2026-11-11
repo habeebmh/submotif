@@ -56,6 +56,6 @@ Research citations are provided in `docs/MUSIC_THEORY.md`. Reference-product gra
 
 The static website includes layout and motion utilities from Leonxlnx's Taste Skill under the MIT license. The full notice is retained in `web/assets/LICENSE-taste-skill.txt`; its source is [the upstream license](https://github.com/Leonxlnx/taste-skill/blob/main/LICENSE). These utilities are separate from the SUBMOTIF generation algorithm.
 
-Host Grotesk is self-hosted under the SIL Open Font License 1.1. The supplied copyright and license are retained in `web/assets/fonts/OFL-Host-Grotesk.txt`.
+Familjen Grotesk and IBM Plex Mono are self-hosted under the SIL Open Font License 1.1; their full supplied notices are retained in `web/assets/fonts/OFL-familjengrotesk.txt` and `web/assets/fonts/OFL-ibmplexmono.txt`. Host Grotesk remains available for auxiliary pages under the SIL Open Font License 1.1. The supplied copyright and license are retained in `web/assets/fonts/OFL-Host-Grotesk.txt`.
 
 The plugin screenshots show this project's actual interface. The original audition candidates use freshly generated SUBMOTIF MIDI and project-generated bass/drums. The approved Acid showcase renders the selected pattern, raised by two octaves, through the owner's Serum 2 instrument and requested `TSP_S290V3_Bass_acid_sweep.SerumPreset`. Serum, its preset file, and its saved instrument state are not distributed. The instrument and preset remain subject to their separate licenses. Website playback is an audition aid, not a synthesizer supplied by the plugin.

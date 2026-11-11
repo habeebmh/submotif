@@ -42,7 +42,15 @@ The live preview's synth is specific to the webpage; Submotif itself remains MID
 - `assets/images/submotif-editor.png` and `submotif-editor-large.png` are actual native v1.2.2 Submotif captures, copied from `dist/ui-v1.2.2/`.
 - `share.jpg` is a rendered capture of the landing page hero.
 - Runtime layout/motion components are from `design-taste-frontend` 2.5.1 under `assets/LICENSE-taste-skill.txt`.
-- Host Grotesk 400/500 is self-hosted under `assets/fonts/OFL-Host-Grotesk.txt`.
+- Familjen Grotesk and IBM Plex Mono are self-hosted with their OFL notices under `assets/fonts/`. Host Grotesk remains available for auxiliary pages.
 - The waveform brand graphic carries forward the project’s existing original mark.
 
 Design decisions, recorded deals, facts and the finish-gate report are under `.taste-skill/`. Screenshot and audit output is under `shots/`; neither directory should be deployed.
+
+## November 11 redesign
+
+The earlier page shipped with an incomplete finish gate, accumulated mobile overrides, a decorative overlay, and insufficient checks of short phone viewports and live motion. This was an implementation and verification failure. The archived baseline under `.taste-skill/previous-build/` and short-screen report reproduce the excessive section heights.
+
+The replacement uses the native editor as the hero image, one live generator window, one player with six explicit recording choices, and two plain Ableton routing diagrams. The extra repository/FAQ screen was removed; contribution and Instagram support links are in the footer. It keeps normal document scrolling and uses the upstream hero entrance, hover layer, and word-highlight moment. Reduced-motion behavior comes from the same upstream runtime. There is no timed recording rotation or autoplay. Approved MIDI, audio, provenance and the portable generation engine remain unchanged.
+
+The redesign is a new requested build, with the previous failed gate retained separately. Current validation and viewport evidence are recorded under `web/.taste-skill/` and `web/shots/`, excluded from hosting.
