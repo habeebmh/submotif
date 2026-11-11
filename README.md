@@ -28,10 +28,10 @@ The generation rules draw on research into groove, tonal stability, and melodic 
 
 | Edition | How it fits your session | Requirements |
 | --- | --- | --- |
-| **VST3** | Sends MIDI to your instrument. In Ableton Live, use two MIDI tracks. | Current build target: Apple Silicon, macOS 11+, and a VST3 host that exposes plug-in MIDI output. |
+| **VST3** | Sends MIDI to your instrument. In Ableton Live, use two MIDI tracks. | Build targets: Intel/Apple Silicon macOS 11+ and Windows x64, in a VST3 host that exposes plug-in MIDI output. |
 | **Max for Live** | Goes directly before your instrument on one Ableton MIDI track. | Live Suite, or Live Standard with Max for Live; Max 9.1.3+. |
 
-The current native build targets Apple Silicon only. Intel, Windows, and other DAWs are not yet verified release targets. See [validation notes](docs/VALIDATION.md) for completed checks and remaining host testing. A passing automated test is not a compatibility guarantee.
+Native build automation covers Intel Mac, Apple Silicon, universal Mac and Windows x64. Release and DAW compatibility approval remain pending. See [validation notes](docs/VALIDATION.md) for completed checks and remaining host testing. A passing automated test is not a compatibility guarantee.
 
 Official releases will be free to download from [GitHub Releases](https://github.com/habeebmh/submotif/releases/latest) after review. No payment, follow, or contribution is required. Check the release notes for supported systems, installation instructions, and signing status before installing a build.
 
@@ -84,13 +84,17 @@ GitHub automation stays in `.github/`. Build and test commands below run from th
 
 ## Build from source
 
-For the native macOS build, install Xcode Command Line Tools, CMake 3.22+, a C++17 compiler, Node.js, and Python 3, then run:
+The shared build script supports Intel Mac, Apple Silicon, universal Mac and Windows x64. Install the prerequisites in [BUILDING.md](docs/BUILDING.md), then run on the corresponding OS:
 
 ```sh
-./plugin/scripts/build-macos.sh
+# Mac: one VST3/app containing both Intel and Apple Silicon code
+python3 plugin/scripts/build.py --target macos-universal
+
+# Windows: x64 VST3 and inspection app
+py -3.12 plugin/scripts/build.py --target windows-x64
 ```
 
-The script builds the Apple Silicon VST3 and an editor inspection app, then runs the native, Max, and cross-edition checks. The inspection app has no synthesizer. The VST3 is written to `plugin/build/Undertow_artefacts/Release/VST3/Submotif.vst3`. The script applies a local development signature; it does not perform Developer ID signing or notarization.
+Use `macos-arm64` or `macos-x86_64` for a single Mac architecture. The **Native builds** GitHub workflow builds and tests all four targets and uploads temporary development artifacts. Output folders, dependencies, test coverage and signing status are documented in the [build guide](docs/BUILDING.md). Public releases remain on hold.
 
 JUCE is pinned in `plugin/CMakeLists.txt`. The first configuration fetches it when `.deps/JUCE` is absent, so internet access is needed for that step. Review [third-party notices](docs/THIRD_PARTY_NOTICES.md) before redistributing a build.
 
