@@ -78,38 +78,54 @@ std::array<bool, 16> makeRhythm(const Settings& s, Random& random) {
         mask[2] = mask[10] = true;
         weights[6] = weights[14] = 1;
         const auto support = weightedOrder(weights, random);
-        const int extras = roundCount(2.0 * s.density);
+        const int extras = std::min(2, roundCount(4.0 * s.density));
         for (int i = 0; i < extras; ++i) mask[support[i]] = true;
         weights.fill(0);
-        for (int step = 3; step < 16; step += 2) weights[step] = step >= 11 ? 2.0 : .5;
+        // A high-density pickup belongs to an existing offbeat pulse.
+        for (int step : {6, 10, 14}) if (mask[step]) weights[step - 1] = step >= 10 ? 2.0 : .5;
         const auto pickups = weightedOrder(weights, random);
         const int count = s.density > .75 ? roundCount((s.density - .75) * 8.0) : 0;
         for (int i = 0; i < count; ++i) mask[pickups[i]] = true;
         return mask;
     }
     if (s.style == Style::rolling) {
-        mask[0] = mask[6] = true;
+        const int arrival = random.unit() < .65 ? 0 : 2;
+        const int reply = arrival == 0 ? (random.unit() < .55 ? 3 : 6) : (random.unit() < .5 ? 5 : 6);
+        mask[arrival] = mask[reply] = true;
         budget = 2 + roundCount(3.0 * s.density);
-        for (int step = 1; step < 8; ++step)
-            if (step != 6) weights[step] = step == 2 ? 2.2 : (step == 3 || step == 7 ? 1.7 : .65);
+        for (int step = arrival + 1; step < 8; ++step)
+            if (!mask[step]) weights[step] = step == arrival + 1 || step == reply + 1 ? 1.8 : (step % 2 ? .8 : 1.2);
         const auto order = weightedOrder(weights, random);
         for (int i = 0; i < budget - 2; ++i) mask[order[i]] = true;
         for (int i = 0; i < 8; ++i) mask[i + 8] = mask[i];
         return mask;
     }
-    mask[0] = mask[8] = true;
+    int arrival = 0, reply = 8;
+    if (s.style == Style::deep || s.style == Style::funk) {
+        const double phase = random.unit();
+        arrival = phase < (s.style == Style::deep ? .65 : .5) ? 0 : phase < .8 ? 2 : 3;
+        // An anticipation replaces the later beat; it is not an extra random hit.
+        reply = random.unit() < .4 ? 7 : arrival + 8;
+    }
+    mask[arrival] = mask[reply] = true;
     if (s.style == Style::disco) { mask[2] = mask[10] = true; budget = 4 + roundCount(8.0 * s.density); }
     else if (s.style == Style::deep) budget = 2 + roundCount(6.0 * s.density);
     else if (s.style == Style::acid) budget = 4 + roundCount(7.0 * s.density);
     else budget = 3 + roundCount(6.0 * s.density);
     for (int step = 0; step < 16; ++step) {
-        if (mask[step]) continue;
+        if (mask[step] || step < arrival || (reply == 7 && step == 8)
+            || (reply > 8 && step >= 8 && step < reply)) continue;
         const bool beat = step % 4 == 0, eighth = step % 4 == 2;
         if (s.style == Style::deep) weights[step] = eighth ? 2.0 : (step % 4 == 3 ? 1.5 : (beat ? .55 : .35));
         else if (s.style == Style::acid) weights[step] = step % 2 ? 1.4 : 1.0;
         else if (s.style == Style::disco) weights[step] = step % 2 ? .18 : 5.0;
         else weights[step] = step % 4 == 3 ? 2.5 : (eighth ? 1.3 : (beat ? .5 : .8));
         if (step >= 12 && s.style != Style::disco) weights[step] *= 1.15;
+        if (s.style == Style::deep || s.style == Style::funk) {
+            // Responses are related to the selected arrivals, not just the grid.
+            if (step == arrival + 2 || step == reply + 2) weights[step] *= 2.0;
+            if (step == reply - 1) weights[step] *= 1.5;
+        }
     }
     const auto order = weightedOrder(weights, random);
     const int mandatory = s.style == Style::disco ? 4 : 2;
@@ -156,22 +172,34 @@ void resolveConnectors(std::vector<Note>& notes, double length, const Settings& 
 }
 void articulate(std::vector<Note>& notes, const Settings& s, Random& random, int accentStep) {
     const int centreVelocity = 96 + random.integer(7) - 3;
+    std::vector<int> heldOptions;
+    for (std::size_t i = 0; i < notes.size() && notes[i].start < 2.0; ++i) {
+        double next = i + 1 < notes.size() ? notes[i + 1].start : 4.0;
+        if (s.style == Style::rolling) next = std::min(next, 2.0);
+        if (next - notes[i].start >= .48) heldOptions.push_back(gridStep(notes[i].start));
+    }
+    const int heldStep = heldOptions.empty() ? gridStep(notes.front().start)
+        : heldOptions[random.integer(static_cast<int>(heldOptions.size()))];
     for (std::size_t i = 0; i < notes.size(); ++i) {
         auto& n = notes[i];
         const int step = gridStep(n.start);
-        const bool anchor = step % 8 == 0, beat = step % 4 == 0;
+        const bool anticipated = (s.style == Style::deep || s.style == Style::funk) && step == 7
+            && std::none_of(notes.begin(), notes.end(), [](const Note& other) { return gridStep(other.start) == 8; });
+        const bool anchor = i == 0 || anticipated || (notes[i - 1].start < 2.0 && n.start >= 2.0), beat = step % 4 == 0;
         const bool accent = s.style == Style::acid && step % 8 == accentStep;
         int velocity = centreVelocity + (anchor ? 10 : (beat ? 4 : (step % 2 ? -9 : -2)));
-        if (accent) velocity += 13;
+        if (s.style == Style::acid) velocity = centreVelocity + (accent ? 17 : -5);
         n.velocity = std::clamp(velocity + random.integer(5) - 2, 48, 123);
         double duration = .1 + .25 * s.gate;
         if (s.style == Style::deep) duration = anchor ? .35 + .85 * s.gate : .13 + .30 * s.gate;
-        else if (s.style == Style::rolling) duration = .065 + .19 * s.gate;
+        else if (s.style == Style::rolling) duration = step % 8 == heldStep ? .18 + .55 * s.gate : .055 + .14 * s.gate;
         else if (s.style == Style::offbeat) duration = step % 2 ? .045 + .11 * s.gate : .08 + .32 * s.gate;
-        else if (s.style == Style::acid) duration = accent ? .12 + .40 * s.gate : .065 + .24 * s.gate;
-        else if (s.style == Style::disco) duration = step % 2 ? .05 + .13 * s.gate : .12 + .37 * s.gate;
+        else if (s.style == Style::acid) duration = step % 8 == heldStep ? .22 + .70 * s.gate : .06 + .18 * s.gate;
+        else if (s.style == Style::disco) duration = step % 2 ? .05 + .13 * s.gate
+            : n.pitch == basePitch(s) + 12 ? .075 + .23 * s.gate : .12 + .37 * s.gate;
         else duration = anchor ? .13 + .30 * s.gate : .06 + .18 * s.gate;
-        const double next = i + 1 < notes.size() ? notes[i + 1].start : 4.0;
+        double next = i + 1 < notes.size() ? notes[i + 1].start : 4.0;
+        if (s.style == Style::rolling && n.start < 2.0) next = std::min(next, 2.0);
         const double room = next - n.start;
         n.duration = std::max(.04, std::min(duration, room * (.74 + .20 * s.gate)));
     }
@@ -221,42 +249,103 @@ void addConnectors(std::vector<Note>& notes, const Settings& s, Random& random) 
     fitDurations(notes, 4.0);
     resolveConnectors(notes, 4.0, s);
 }
+double pitchTransition(int from, int to, const Settings& s) noexcept {
+    const int distance = std::abs(to - from);
+    if (distance == 0) return 1.8;
+    if (distance <= 4) return 1.2;
+    if (distance <= 7) return .8;
+    if (distance == 12) return s.style == Style::disco ? 1.8 : .45;
+    return .3;
+}
+int weightedState(const std::array<double, 4>& weights, Random& random) {
+    double sum = 0; for (double w : weights) sum += w;
+    double draw = random.unit() * sum;
+    int last = 0;
+    for (int i = 0; i < 4; ++i) if (weights[i] > 0) {
+        last = i; if ((draw -= weights[i]) < 0) return i;
+    }
+    return last;
+}
+void composePitches(std::vector<Note>& notes, const Settings& s, Random& random) {
+    const int base = basePitch(s);
+    const std::array<int, 4> pitches{{base, base + third(s), base + 7, base + 12}};
+    const std::array<bool, 4> active{{true, !s.rootOnly, !s.rootOnly, s.octaveJumps && base + 12 <= 71}};
+    int count = static_cast<int>(notes.size());
+    if (s.style == Style::rolling) {
+        count = 0; for (const auto& n : notes) if (n.start < 2.0) ++count;
+    }
+    if (count == 0) return;
+    const std::array<double, 6> colourRates{{.65, .45, .35, .65, .55, .65}};
+    const double desired = s.rootOnly ? 0 : count * static_cast<double>(s.movement) * colourRates[static_cast<int>(s.style)];
+    int budget = static_cast<int>(std::floor(desired));
+    if (random.unit() < desired - budget) ++budget;
+    budget = std::min(budget, std::max(0, count - 2));
+    const auto coloured = [](int state) { return state == 1 || state == 2 ? 1 : 0; };
+    int first = 0;
+    if (!s.anchorRoot) first = weightedState({{1.5, active[1] && budget ? .4 : 0,
+        active[2] && budget ? .6 : 0, active[3] ? .2 : 0}}, random);
+    std::array<double, 4> endings{{4.0, .45 * s.movement, .8 * s.movement,
+        s.style == Style::disco ? 3.0 : .45 + .55 * s.movement}};
+    for (int state = 0; state < 4; ++state) {
+        if (!active[state] || coloured(state) + coloured(first) > budget) endings[state] = 0;
+        else endings[state] *= pitchTransition(pitches[state], pitches[first], s);
+    }
+    const int last = count == 1 ? first : weightedState(endings, random);
+    const double crest = .3 + .4 * random.unit();
+    const double peak = active[3] && random.unit() < .4 ? 12.0 : 7.0;
+    const auto emission = [&](int index, int state) {
+        if (!active[state] || (index == 0 && state != first) || (index == count - 1 && state != last)) return 0.0;
+        const double progress = count > 1 ? static_cast<double>(index) / (count - 1) : 0;
+        const double contour = peak * (progress <= crest ? progress / crest : (1 - progress) / (1 - crest));
+        double weight = state == 0 ? 1.0 : state == 1 ? .9 : state == 2 ? 1.15 : .5;
+        weight /= 1 + .13 * std::abs(pitches[state] - base - contour);
+        const int step = gridStep(notes[index].start);
+        if (s.style == Style::disco && state == 3) weight *= step % 4 >= 2 ? 12 : .4;
+        else if (s.style == Style::offbeat && state == 0) weight *= 2;
+        else if (s.style == Style::acid && state == 3) weight *= 1.6;
+        if (step % 4 == 0 && state == 0) weight *= 1.5;
+        return weight;
+    };
+    // Finite-state backward weighting: each forward draw includes the mass of
+    // all feasible suffixes, rather than choosing a note and repairing its end.
+    // The extra budget state enforces a bounded number of non-tonic attacks.
+    using Row = std::array<std::array<double, 17>, 4>;
+    std::vector<Row> suffix(static_cast<std::size_t>(count + 1));
+    for (int previous = 0; previous < 4; ++previous) suffix[count][previous][0] = 1;
+    for (int index = count - 1; index >= 0; --index)
+        for (int previous = 0; previous < 4; ++previous)
+            for (int remaining = 0; remaining <= budget; ++remaining)
+                for (int state = 0; state < 4; ++state) {
+                    const int cost = coloured(state);
+                    if (cost > remaining) continue;
+                    suffix[index][previous][remaining] += emission(index, state)
+                        * pitchTransition(pitches[previous], pitches[state], s)
+                        * suffix[index + 1][state][remaining - cost];
+                }
+    int previous = first, remaining = budget;
+    for (int index = 0; index < count; ++index) {
+        std::array<double, 4> weights{};
+        for (int state = 0; state < 4; ++state) if (coloured(state) <= remaining)
+            weights[state] = emission(index, state) * pitchTransition(pitches[previous], pitches[state], s)
+                * suffix[index + 1][state][remaining - coloured(state)];
+        const int state = weightedState(weights, random);
+        notes[index].pitch = pitches[state]; remaining -= coloured(state); previous = state;
+    }
+    if (s.style == Style::rolling) for (auto& n : notes) if (n.start >= 2.0)
+        for (int i = 0; i < count; ++i) if (std::abs(notes[i].start + 2.0 - n.start) < epsilon) {
+            n.pitch = notes[i].pitch; break;
+        }
+}
 std::vector<Note> makeMotif(const Settings& s, Random& random) {
     const auto mask = makeRhythm(s, random);
-    const int base = basePitch(s), upper = base + 12;
-    const bool canUpper = s.octaveJumps && upper <= 71;
-    const int colour = s.rootOnly ? base : base + (random.unit() < .68 ? 7 : third(s));
-    const bool answer = random.unit() < .18 + .70 * s.movement;
-    const bool upperRole = canUpper && random.unit() < (s.style == Style::disco ? 1.0 : (s.style == Style::rolling ? .50 : .25 + .30 * s.movement));
-    const int pivot = random.unit() < .5 ? 4 : 6;
-    int finalHalfStep = 0, accentStep = 0;
-    for (int step = 0; step < 8; ++step) if (mask[step]) finalHalfStep = step;
-    std::vector<int> accentOptions;
-    for (int step = 1; step < 8; ++step) if (mask[step]) accentOptions.push_back(step);
-    if (!accentOptions.empty()) accentStep = accentOptions[random.integer(static_cast<int>(accentOptions.size()))];
     std::vector<Note> notes;
-    for (int step = 0; step < 16; ++step) {
-        if (!mask[step]) continue;
-        int pitch = base;
-        const int half = step % 8;
-        if (s.style == Style::rolling) {
-            if (answer && half == finalHalfStep) pitch = upperRole ? upper : colour;
-        } else if (s.style == Style::disco) {
-            if (upperRole && step % 4 >= 2) pitch = upper;
-            else if (answer && half == 4) pitch = colour;
-        } else if (s.style == Style::offbeat) {
-            if (answer && step >= 14) pitch = upperRole ? upper : colour;
-        } else if (s.style == Style::funk) {
-            if (answer && step % 4 == 3) pitch = colour;
-            if (half == 6 && (upperRole || answer)) pitch = upperRole ? upper : colour;
-        } else {
-            if (answer && half >= pivot) pitch = colour;
-            if (s.style == Style::acid && upperRole && s.movement > .6 && half == accentStep) pitch = upper;
-        }
-        notes.push_back({onset(step, s), .1, pitch, 96, false});
+    std::vector<int> accentOptions;
+    for (int step = 0; step < 16; ++step) if (mask[step]) {
+        notes.push_back({onset(step, s), .1, basePitch(s), 96, false});
+        if (step > 0 && step < 8) accentOptions.push_back(step);
     }
-    if (!s.anchorRoot && !s.rootOnly && random.unit() < .25 + .40 * s.movement) notes.front().pitch = colour;
-    if (s.anchorRoot) notes.front().pitch = base;
+    const int accentStep = accentOptions.empty() ? 0 : accentOptions[random.integer(static_cast<int>(accentOptions.size()))];
+    composePitches(notes, s, random);
     articulate(notes, s, random, accentStep);
     addConnectors(notes, s, random);
     return notes;

@@ -147,7 +147,7 @@ def main():
              'These are original offline demo sounds; the plug-in continues to use your own instrument.', '', '| Style | Before / after | Revised only |', '|---|---|---|']
     for style in STYLES:
         guide.append(f'| {style.title()} | [{style}-before-after.wav]({style}-before-after.wav) | [{style}-revised.wav]({style}-revised.wav) |')
-    guide += ['', 'The `midi/` folder contains each exact two-bar phrase. `audition-manifest.json` lists timestamps and seeds.',
+    guide += ['', 'The `midi/` folder contains each exact source phrase at its audited loop length. `audition-manifest.json` lists timestamps and seeds.',
               'Structural measurements are not listening scores. Judge these in your track as well as against this neutral accompaniment.']
     (args.output / 'README.md').write_text('\n'.join(guide) + '\n')
     print(json.dumps({'output': str(args.output), 'comparisons': len(comparisons),

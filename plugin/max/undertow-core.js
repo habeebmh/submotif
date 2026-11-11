@@ -83,40 +83,57 @@ var UndertowCore = (function () {
         return order;
     }
     function makeRhythm(s,random) {
-        var mask=zeros(),weights=zeros(),budget=0,order,i,step;
+        var mask=zeros(),weights=zeros(),budget=0,order,i,step,arrival,reply;
         if(s.style===2) {
             mask[2]=mask[10]=true;weights[6]=weights[14]=1;
             order=weightedOrder(weights,random);
-            var extras=roundCount(2*s.density);
+            var extras=Math.min(2,roundCount(4*s.density));
             for(i=0;i<extras;i++)mask[order[i]]=true;
             weights=zeros();
-            for(step=3;step<16;step+=2)weights[step]=step>=11?2:0.5;
+            // A high-density pickup belongs to an existing offbeat pulse.
+            for(step=6;step<16;step+=4)if(mask[step])weights[step-1]=step>=10?2:0.5;
             order=weightedOrder(weights,random);
             var count=s.density>0.75?roundCount((s.density-0.75)*8):0;
             for(i=0;i<count;i++)mask[order[i]]=true;
             return mask;
         }
         if(s.style===1) {
-            mask[0]=mask[6]=true;budget=2+roundCount(3*s.density);
-            for(step=1;step<8;step++)if(step!==6)weights[step]=step===2?2.2:(step===3||step===7?1.7:0.65);
+            arrival=random()<0.65?0:2;
+            reply=arrival===0?(random()<0.55?3:6):(random()<0.5?5:6);
+            mask[arrival]=mask[reply]=true;budget=2+roundCount(3*s.density);
+            for(step=arrival+1;step<8;step++)
+                if(!mask[step])weights[step]=step===arrival+1||step===reply+1?1.8:(step%2?0.8:1.2);
             order=weightedOrder(weights,random);
             for(i=0;i<budget-2;i++)mask[order[i]]=true;
             for(i=0;i<8;i++)mask[i+8]=mask[i];
             return mask;
         }
-        mask[0]=mask[8]=true;
+        arrival=0;reply=8;
+        if(s.style===0||s.style===5) {
+            var phase=random();
+            arrival=phase<(s.style===0?0.65:0.5)?0:phase<0.8?2:3;
+            // An anticipation replaces the later beat rather than adding a hit.
+            reply=random()<0.4?7:arrival+8;
+        }
+        mask[arrival]=mask[reply]=true;
         if(s.style===4){mask[2]=mask[10]=true;budget=4+roundCount(8*s.density);}
         else if(s.style===0)budget=2+roundCount(6*s.density);
         else if(s.style===3)budget=4+roundCount(7*s.density);
         else budget=3+roundCount(6*s.density);
         for(step=0;step<16;step++) {
-            if(mask[step])continue;
+            if(mask[step]||step<arrival||(reply===7&&step===8)
+                ||(reply>8&&step>=8&&step<reply))continue;
             var beat=step%4===0,eighth=step%4===2;
             if(s.style===0)weights[step]=eighth?2:(step%4===3?1.5:(beat?0.55:0.35));
             else if(s.style===3)weights[step]=step%2?1.4:1;
             else if(s.style===4)weights[step]=step%2?0.18:5;
             else weights[step]=step%4===3?2.5:(eighth?1.3:(beat?0.5:0.8));
             if(step>=12&&s.style!==4)weights[step]*=1.15;
+            if(s.style===0||s.style===5) {
+                // Responses follow the selected arrivals as well as the grid.
+                if(step===arrival+2||step===reply+2)weights[step]*=2;
+                if(step===reply-1)weights[step]*=1.5;
+            }
         }
         order=weightedOrder(weights,random);
         var mandatory=s.style===4?4:2;
@@ -150,21 +167,35 @@ var UndertowCore = (function () {
         for(var i=0;i<notes.length;i++)if(!notes[i].locked&&!triadic(notes[i].pitch,s)&&!resolves(notes,i,length,s))notes[i].pitch=nearestTriad(notes[i].pitch,s);
     }
     function articulate(notes,s,random,accentStep) {
-        var centreVelocity=96+random.integer(7)-3,i,n;
+        var centreVelocity=96+random.integer(7)-3,heldOptions=[],i,n,next;
+        for(i=0;i<notes.length&&notes[i].start<2;i++) {
+            next=i+1<notes.length?notes[i+1].start:4;
+            if(s.style===1)next=Math.min(next,2);
+            if(next-notes[i].start>=0.48)heldOptions.push(gridStep(notes[i].start));
+        }
+        var heldStep=heldOptions.length?heldOptions[random.integer(heldOptions.length)]:gridStep(notes[0].start);
         for(i=0;i<notes.length;i++) {
-            n=notes[i];var step=gridStep(n.start),anchor=step%8===0,beat=step%4===0;
+            n=notes[i];var step=gridStep(n.start),anticipated=false;
+            if((s.style===0||s.style===5)&&step===7) {
+                anticipated=true;
+                for(var other=0;other<notes.length;other++)if(gridStep(notes[other].start)===8){anticipated=false;break;}
+            }
+            var anchor=i===0||anticipated||(notes[i-1].start<2&&n.start>=2),beat=step%4===0;
             var accent=s.style===3&&step%8===accentStep;
             var velocity=centreVelocity+(anchor?10:(beat?4:(step%2?-9:-2)));
-            if(accent)velocity+=13;
+            if(s.style===3)velocity=centreVelocity+(accent?17:-5);
             n.velocity=clamp(velocity+random.integer(5)-2,48,123);
             var duration=0.1+0.25*s.gate;
             if(s.style===0)duration=anchor?0.35+0.85*s.gate:0.13+0.30*s.gate;
-            else if(s.style===1)duration=0.065+0.19*s.gate;
+            else if(s.style===1)duration=step%8===heldStep?0.18+0.55*s.gate:0.055+0.14*s.gate;
             else if(s.style===2)duration=step%2?0.045+0.11*s.gate:0.08+0.32*s.gate;
-            else if(s.style===3)duration=accent?0.12+0.40*s.gate:0.065+0.24*s.gate;
-            else if(s.style===4)duration=step%2?0.05+0.13*s.gate:0.12+0.37*s.gate;
+            else if(s.style===3)duration=step%8===heldStep?0.22+0.70*s.gate:0.06+0.18*s.gate;
+            else if(s.style===4)duration=step%2?0.05+0.13*s.gate
+                :n.pitch===basePitch(s)+12?0.075+0.23*s.gate:0.12+0.37*s.gate;
             else duration=anchor?0.13+0.30*s.gate:0.06+0.18*s.gate;
-            var next=i+1<notes.length?notes[i+1].start:4,room=next-n.start;
+            next=i+1<notes.length?notes[i+1].start:4;
+            if(s.style===1&&n.start<2)next=Math.min(next,2);
+            var room=next-n.start;
             n.duration=Math.max(0.04,Math.min(duration,room*(0.74+0.20*s.gate)));
         }
         if(s.style===1)for(i=0;i<notes.length;i++) {
@@ -203,29 +234,107 @@ var UndertowCore = (function () {
         }
         fitDurations(notes,4);resolveConnectors(notes,4,s);
     }
-    function makeMotif(s,random) {
-        var mask=makeRhythm(s,random),base=basePitch(s),upper=base+12,canUpper=s.octaveJumps&&upper<=71;
-        var colour=s.rootOnly?base:base+(random()<0.68?7:third(s));
-        var answer=random()<0.18+0.70*s.movement;
-        var upperRole=canUpper&&random()<(s.style===4?1:(s.style===1?0.50:0.25+0.30*s.movement));
-        var pivot=random()<0.5?4:6,finalHalfStep=0,accentStep=0,step;
-        for(step=0;step<8;step++)if(mask[step])finalHalfStep=step;
-        var accentOptions=[];
-        for(step=1;step<8;step++)if(mask[step])accentOptions.push(step);
-        if(accentOptions.length)accentStep=accentOptions[random.integer(accentOptions.length)];
-        var notes=[];
-        for(step=0;step<16;step++) {
-            if(!mask[step])continue;
-            var pitch=base,half=step%8;
-            if(s.style===1){if(answer&&half===finalHalfStep)pitch=upperRole?upper:colour;}
-            else if(s.style===4){if(upperRole&&step%4>=2)pitch=upper;else if(answer&&half===4)pitch=colour;}
-            else if(s.style===2){if(answer&&step>=14)pitch=upperRole?upper:colour;}
-            else if(s.style===5){if(answer&&step%4===3)pitch=colour;if(half===6&&(upperRole||answer))pitch=upperRole?upper:colour;}
-            else {if(answer&&half>=pivot)pitch=colour;if(s.style===3&&upperRole&&s.movement>0.6&&half===accentStep)pitch=upper;}
-            notes.push({start:onset(step,s),duration:0.1,pitch:pitch,velocity:96,locked:false});
+    function pitchTransition(from,to,s) {
+        var distance=Math.abs(to-from);
+        if(distance===0)return 1.8;
+        if(distance<=4)return 1.2;
+        if(distance<=7)return 0.8;
+        if(distance===12)return s.style===4?1.8:0.45;
+        return 0.3;
+    }
+    function weightedState(weights,random) {
+        var sum=0,i;
+        for(i=0;i<4;i++)sum+=weights[i];
+        var draw=random()*sum,last=0;
+        for(i=0;i<4;i++)if(weights[i]>0) {
+            last=i;draw-=weights[i];if(draw<0)return i;
         }
-        if(!s.anchorRoot&&!s.rootOnly&&random()<0.25+0.40*s.movement)notes[0].pitch=colour;
-        if(s.anchorRoot)notes[0].pitch=base;
+        return last;
+    }
+    function composePitches(notes,s,random) {
+        var base=basePitch(s),pitches=[base,base+third(s),base+7,base+12];
+        var active=[true,!s.rootOnly,!s.rootOnly,s.octaveJumps&&base+12<=71];
+        var count=notes.length,i;
+        if(s.style===1) {
+            count=0;for(i=0;i<notes.length;i++)if(notes[i].start<2)count++;
+        }
+        if(count===0)return;
+        var colourRates=[0.65,0.45,0.35,0.65,0.55,0.65];
+        var desired=s.rootOnly?0:count*s.movement*colourRates[s.style];
+        var budget=Math.floor(desired);
+        if(random()<desired-budget)budget++;
+        budget=Math.min(budget,Math.max(0,count-2));
+        var coloured=function(state){return state===1||state===2?1:0;};
+        var first=0;
+        if(!s.anchorRoot)first=weightedState([1.5,active[1]&&budget?0.4:0,
+            active[2]&&budget?0.6:0,active[3]?0.2:0],random);
+        var endings=[4,0.45*s.movement,0.8*s.movement,s.style===4?3:0.45+0.55*s.movement];
+        var state;
+        for(state=0;state<4;state++) {
+            if(!active[state]||coloured(state)+coloured(first)>budget)endings[state]=0;
+            else endings[state]*=pitchTransition(pitches[state],pitches[first],s);
+        }
+        var last=count===1?first:weightedState(endings,random);
+        var crest=0.3+0.4*random();
+        var peak=active[3]&&random()<0.4?12:7;
+        var emission=function(index,state) {
+            if(!active[state]||(index===0&&state!==first)||(index===count-1&&state!==last))return 0;
+            var progress=count>1?index/(count-1):0;
+            var contour=peak*(progress<=crest?progress/crest:(1-progress)/(1-crest));
+            var weight=state===0?1:state===1?0.9:state===2?1.15:0.5;
+            weight/=1+0.13*Math.abs(pitches[state]-base-contour);
+            var step=gridStep(notes[index].start);
+            if(s.style===4&&state===3)weight*=step%4>=2?12:0.4;
+            else if(s.style===2&&state===0)weight*=2;
+            else if(s.style===3&&state===3)weight*=1.6;
+            if(step%4===0&&state===0)weight*=1.5;
+            return weight;
+        };
+        // Each forward draw includes the mass of all feasible suffixes. The
+        // extra budget state bounds non-tonic attacks, matching the C++ order.
+        var suffix=[],index,previous,remaining;
+        for(index=0;index<=count;index++) {
+            var row=[];
+            for(previous=0;previous<4;previous++) {
+                var amounts=[];
+                for(remaining=0;remaining<17;remaining++)amounts.push(0);
+                row.push(amounts);
+            }
+            suffix.push(row);
+        }
+        for(previous=0;previous<4;previous++)suffix[count][previous][0]=1;
+        for(index=count-1;index>=0;index--)
+            for(previous=0;previous<4;previous++)
+                for(remaining=0;remaining<=budget;remaining++)
+                    for(state=0;state<4;state++) {
+                        var cost=coloured(state);
+                        if(cost>remaining)continue;
+                        suffix[index][previous][remaining]+=emission(index,state)
+                            *pitchTransition(pitches[previous],pitches[state],s)
+                            *suffix[index+1][state][remaining-cost];
+                    }
+        previous=first;remaining=budget;
+        for(index=0;index<count;index++) {
+            var weights=[0,0,0,0];
+            for(state=0;state<4;state++)if(coloured(state)<=remaining)
+                weights[state]=emission(index,state)*pitchTransition(pitches[previous],pitches[state],s)
+                    *suffix[index+1][state][remaining-coloured(state)];
+            state=weightedState(weights,random);
+            notes[index].pitch=pitches[state];remaining-=coloured(state);previous=state;
+        }
+        if(s.style===1)for(var n=0;n<notes.length;n++)if(notes[n].start>=2)
+            for(i=0;i<count;i++)if(Math.abs(notes[i].start+2-notes[n].start)<epsilon) {
+                notes[n].pitch=notes[i].pitch;break;
+            }
+    }
+    function makeMotif(s,random) {
+        var mask=makeRhythm(s,random),notes=[],accentOptions=[];
+        for(var step=0;step<16;step++)if(mask[step]) {
+            notes.push({start:onset(step,s),duration:0.1,pitch:basePitch(s),velocity:96,locked:false});
+            if(step>0&&step<8)accentOptions.push(step);
+        }
+        var accentStep=accentOptions.length?accentOptions[random.integer(accentOptions.length)]:0;
+        composePitches(notes,s,random);
         articulate(notes,s,random,accentStep);addConnectors(notes,s,random);
         return notes;
     }

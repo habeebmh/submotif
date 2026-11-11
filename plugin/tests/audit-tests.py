@@ -19,6 +19,30 @@ def row(notes, bars=2):
 
 
 class AuditMetricsTests(unittest.TestCase):
+    def test_one_bar_has_no_second_bar_comparisons(self):
+        result = audit.describe(row([note(0), note(2, 43)], 1))
+        self.assertEqual(result['notes_per_bar'], 2)
+        self.assertEqual(result['empty_bar_pct'], 0)
+        self.assertEqual(result['pitch_classes'], 2)
+        self.assertEqual(result['loop_boundary_leap'], 7)
+        for metric in ('bar_onset_jaccard', 'exact_bar_rhythm_pct',
+                       'exact_bar_pitch_rhythm_pct', 'second_bar_first_root_pct'):
+            self.assertIsNone(result[metric], metric)
+        for lag in (1, 2):
+            for metric in ('onset_overlap_pct', 'pitch_retention_pct', 'duration_retention_pct',
+                           'velocity_retention_pct', 'full_note_retention_pct'):
+                self.assertIsNone(result[f'repeat_lag{lag}_{metric}'])
+
+    def test_one_bar_diversity_does_not_claim_two_bar_motifs(self):
+        result = audit.describe_diversity([row([note(0)], 1), row([note(1, 43)], 1)])
+        self.assertEqual(result['distinct_first_bar_onset_motifs'], 2)
+        self.assertEqual(result['distinct_first_bar_pitch_onset_motifs'], 2)
+        self.assertEqual(result['first_bar_pitch_onset_collision_pct'], 0)
+        for metric in ('distinct_first_two_bar_onset_motifs',
+                       'distinct_first_two_bar_pitch_onset_motifs',
+                       'first_two_bar_pitch_onset_collision_pct'):
+            self.assertIsNone(result[metric], metric)
+
     def test_long_phrase_density_and_empty_bars(self):
         result = audit.describe(row([note(0), note(4)], 4))
         self.assertEqual(result['notes_per_bar'], .5)

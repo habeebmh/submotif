@@ -23,9 +23,9 @@ SOURCE_FILES = ['src/PatternEngine.h', 'src/PatternEngine.cpp', 'max/undertow-co
 METRICS = {
     'notes_per_bar': 'Note count divided by phrase length in four-beat bars.',
     'empty_bar_pct': 'Percentage of all phrase bars containing no note onset.',
-    'bar_onset_jaccard': 'Intersection / union of bar-one/bar-two onset tick sets; ignores pitch and trailing duration.',
-    'exact_bar_rhythm_pct': '100 if the two bars have identical onset tick sets, else 0.',
-    'exact_bar_pitch_rhythm_pct': '100 if both bars have identical (onset tick, MIDI pitch) sets, else 0.',
+    'bar_onset_jaccard': 'Intersection / union of bar-one/bar-two onset tick sets; ignores pitch and trailing duration. Null for one-bar phrases.',
+    'exact_bar_rhythm_pct': '100 if the two bars have identical onset tick sets, else 0. Null for one-bar phrases.',
+    'exact_bar_pitch_rhythm_pct': '100 if both bars have identical (onset tick, MIDI pitch) sets, else 0. Null for one-bar phrases.',
     'pitch_classes': 'Number of distinct pitch classes in the phrase.',
     'pitch_range_semitones': 'Maximum MIDI pitch minus minimum MIDI pitch.',
     'root_note_pct': 'Percentage of notes with selected tonic pitch class.',
@@ -37,7 +37,7 @@ METRICS = {
     'leap_over_fifth_pct': 'Percentage of cyclic adjacent-note intervals exceeding seven semitones.',
     'compound_leap_pct': 'Percentage of cyclic adjacent-note intervals exceeding twelve semitones.',
     'loop_boundary_leap': 'Absolute semitone difference between last and first MIDI pitch.',
-    'second_bar_first_root_pct': '100 if first onset in second bar is tonic, else 0; 0 for empty bar.',
+    'second_bar_first_root_pct': '100 if first onset in second bar is tonic, else 0; 0 for empty bar. Null for one-bar phrases.',
     'final_note_triad_pct': '100 if final onset is C/Eb/G, else 0.',
     'offbeat_eighth_pct': 'Percentage of onsets at half-beat positions between quarter pulses.',
     'sixteenth_pct': 'Percentage at odd sixteenth positions (including swing).',
@@ -61,13 +61,16 @@ DIVERSITY_METRICS = {}
 for scope in ('first_bar', 'first_two_bar'):
     DIVERSITY_METRICS[f'distinct_{scope}_onset_motifs'] = (
         f'Number of distinct {scope.replace("_", " ")} onset signatures across seeds in this condition. '
-        'Onsets are rounded to the nearest sixteenth; durations, velocities, and seed IDs are excluded.')
+        'Onsets are rounded to the nearest sixteenth; durations, velocities, and seed IDs are excluded. '
+        'Only phrases covering the scope are eligible; null if none do.')
     DIVERSITY_METRICS[f'distinct_{scope}_pitch_onset_motifs'] = (
         f'Number of distinct {scope.replace("_", " ")} (nearest-sixteenth onset, MIDI pitch) signatures '
-        'across seeds in this condition. Durations, velocities, and seed IDs are excluded.')
+        'across seeds in this condition. Durations, velocities, and seed IDs are excluded. '
+        'Only phrases covering the scope are eligible; null if none do.')
     DIVERSITY_METRICS[f'{scope}_pitch_onset_collision_pct'] = (
         f'Percentage of unordered pairs of different seed indices having identical {scope.replace("_", " ")} '
-        'pitch/onset signatures. Null with fewer than two seeds. Describes this sample, not the possible output space.')
+        'pitch/onset signatures. Only phrases covering the scope are eligible; null with fewer than two eligible seeds. '
+        'Describes this sample, not the possible output space.')
 
 CPP_ADAPTER = r'''
 #include "PatternEngine.h"
@@ -143,16 +146,17 @@ def describe_repetition(bars):
 def describe_diversity(rows):
     result = {}
     for scope, bar_count in [('first_bar', 1), ('first_two_bar', 2)]:
+        eligible = [row for row in rows if row['pattern']['lengthBeats'] >= bar_count * 4]
         rhythm, pitched = Counter(), Counter()
-        for row in rows:
+        for row in eligible:
             notes = [n for n in row['pattern']['notes'] if n['start'] < bar_count * 4]
             # A coarse structural signature prevents tiny timing/velocity differences
             # from masquerading as newly composed motifs. Pitch/register are retained.
             rhythm[tuple(sorted(math.floor(n['start'] * 4 + .5) for n in notes))] += 1
             pitched[tuple(sorted((math.floor(n['start'] * 4 + .5), n['pitch']) for n in notes))] += 1
-        result[f'distinct_{scope}_onset_motifs'] = len(rhythm)
-        result[f'distinct_{scope}_pitch_onset_motifs'] = len(pitched)
-        pairs = len(rows) * (len(rows) - 1) // 2
+        result[f'distinct_{scope}_onset_motifs'] = len(rhythm) if eligible else None
+        result[f'distinct_{scope}_pitch_onset_motifs'] = len(pitched) if eligible else None
+        pairs = len(eligible) * (len(eligible) - 1) // 2
         collisions = sum(n * (n - 1) // 2 for n in pitched.values())
         result[f'{scope}_pitch_onset_collision_pct'] = 100 * collisions / pairs if pairs else None
     return result
@@ -165,9 +169,10 @@ def describe(row):
     scale = {0, 2, 3, 5, 7, 8, 10}
     bar_count = int(p['lengthBeats'] / 4)
     bars = [[n for n in notes if b * 4 <= n['start'] < (b + 1) * 4] for b in range(bar_count)]
-    # These existing fields intentionally retain their first-two-bars definition.
-    onsets = [{tick(n['start'] - b * 4) for n in bars[b]} for b in range(2)]
-    pitched = [{(tick(n['start'] - b * 4), n['pitch']) for n in bars[b]} for b in range(2)]
+    # Missing bars are ineligible, not empty or repeated copies of the first bar.
+    has_second_bar = bar_count >= 2
+    onsets = [{tick(n['start'] - b * 4) for n in bar} for b, bar in enumerate(bars[:2])]
+    pitched = [{(tick(n['start'] - b * 4), n['pitch']) for n in bar} for b, bar in enumerate(bars[:2])]
     strong = [n for n in notes if abs(n['start'] - round(n['start'])) < 1e-6]
     tensions = [n for n in notes if n['pitch'] % 12 not in triad]
     unresolved = 0
@@ -184,9 +189,9 @@ def describe(row):
     return {
         'notes_per_bar': len(notes) / bar_count,
         'empty_bar_pct': 100 * sum(not b for b in bars) / bar_count,
-        'bar_onset_jaccard': ratio(len(onsets[0] & onsets[1]), len(onsets[0] | onsets[1])),
-        'exact_bar_rhythm_pct': 100 * (onsets[0] == onsets[1]),
-        'exact_bar_pitch_rhythm_pct': 100 * (pitched[0] == pitched[1]),
+        'bar_onset_jaccard': ratio(len(onsets[0] & onsets[1]), len(onsets[0] | onsets[1])) if has_second_bar else None,
+        'exact_bar_rhythm_pct': 100 * (onsets[0] == onsets[1]) if has_second_bar else None,
+        'exact_bar_pitch_rhythm_pct': 100 * (pitched[0] == pitched[1]) if has_second_bar else None,
         'pitch_classes': len({n['pitch'] % 12 for n in notes}),
         'pitch_range_semitones': max(n['pitch'] for n in notes) - min(n['pitch'] for n in notes),
         'root_note_pct': 100 * ratio(sum(n['pitch'] % 12 == 0 for n in notes), len(notes)),
@@ -198,7 +203,7 @@ def describe(row):
         'leap_over_fifth_pct': 100 * ratio(sum(x > 7 for x in leaps), len(leaps)),
         'compound_leap_pct': 100 * ratio(sum(x > 12 for x in leaps), len(leaps)),
         'loop_boundary_leap': leaps[-1],
-        'second_bar_first_root_pct': 100 * bool(bars[1] and bars[1][0]['pitch'] % 12 == 0),
+        'second_bar_first_root_pct': 100 * bool(bars[1] and bars[1][0]['pitch'] % 12 == 0) if has_second_bar else None,
         'final_note_triad_pct': 100 * (notes[-1]['pitch'] % 12 in triad),
         'offbeat_eighth_pct': 100 * ratio(sum(abs(n['start'] % 1 - .5) < 1e-6 for n in notes), len(notes)),
         'sixteenth_pct': 100 * ratio(sum(int(math.floor(n['start'] * 4 + .5)) % 2 for n in notes), len(notes)),
@@ -212,7 +217,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--seeds', type=int, default=256)
-    parser.add_argument('--bars', type=int, choices=(2, 4, 8), default=2,
+    parser.add_argument('--bars', type=int, choices=(1, 2, 4, 8), default=2,
                         help='Phrase length; compare baselines only at the same length (default: 2).')
     args = parser.parse_args()
     if not 1 <= args.seeds <= 10000:

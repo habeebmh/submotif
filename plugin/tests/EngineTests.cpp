@@ -321,6 +321,78 @@ void musicalStructureTests() {
     check(weakCounts[3]/noteCounts[3]>weakCounts[4]/noteCounts[4],"Acid has more sixteenth subdivision activity than Disco");
     check(weakCounts[5]/noteCounts[5]>weakCounts[4]/noteCounts[4],"Funk has more weak sixteenth attacks than Disco's eighth drive");
 }
+void phraseVocabularyTests() {
+    // Controls must affect the one-bar phrase itself, not only later response bars.
+    for (int style = 0; style < 6; ++style) {
+        int completeTriads = 0;
+        for (unsigned i = 0; i < 128; ++i) {
+            Settings s; s.style = static_cast<Style>(style); s.movement = 1; s.density = .85f;
+            const auto p = generate(s, 0xa341316cu + i * 2654435761u);
+            bool thirdFound = false, fifthFound = false;
+            for (int n = 0; n < p.count; ++n) {
+                thirdFound |= p.notes[n].pitch % 12 == 3;
+                fifthFound |= p.notes[n].pitch % 12 == 7;
+            }
+            completeTriads += thirdFound && fifthFound;
+        }
+        check(completeTriads > 0, "high Melody can combine third and fifth in one bar, style " + std::to_string(style));
+    }
+    int upperTonic = 0;
+    for (unsigned i = 0; i < 128; ++i) {
+        Settings s; s.style = Style::deep; s.movement = 1;
+        const auto p = generate(s, 0xa341316cu + i * 2654435761u);
+        for (int n = 0; n < p.count; ++n) upperTonic += p.notes[n].pitch == 48;
+    }
+    check(upperTonic > 0, "Deep can realize the enabled upper-tonic role within one bar");
+}
+void rhythmicRoleTests() {
+    bool shortAccent = false, longUnaccented = false;
+    for (unsigned seed = 0; seed < 128; ++seed) {
+        Settings s; s.style = Style::acid; s.movement = 0;
+        const auto p = generate(s, 0xa341316cu + seed * 2654435761u);
+        for (int n = 0; n < p.count; ++n) {
+            shortAccent |= p.notes[n].velocity >= 108 && p.notes[n].duration < .20;
+            longUnaccented |= p.notes[n].velocity < 105 && p.notes[n].duration > .30;
+        }
+    }
+    check(shortAccent && longUnaccented, "Acid can accent short notes and sustain unaccented notes independently");
+    int delayedDeep = 0, delayedFunk = 0, anticipationDeep = 0, anticipationFunk = 0;
+    for (unsigned seed = 0; seed < 128; ++seed) {
+        const auto id = 0xa341316cu + seed * 2654435761u;
+        Settings s; s.movement = 0; s.style = Style::offbeat;
+        auto p = generate(s, id);
+        check(p.count == 4, "default unornamented Offbeat supplies all four between-kick pulses");
+        s.style = Style::rolling; p = generate(s, id);
+        double shortest = 4, longest = 0;
+        for (int n = 0; n < p.count; ++n) {
+            shortest = std::min(shortest, p.notes[n].duration);
+            longest = std::max(longest, p.notes[n].duration);
+            if (p.notes[n].start >= 2) {
+                bool repeated = false;
+                for (int k = 0; k < p.count; ++k)
+                    if (std::abs(p.notes[k].start + 2 - p.notes[n].start) < 1.e-8)
+                        repeated = p.notes[k].pitch == p.notes[n].pitch
+                            && p.notes[k].velocity == p.notes[n].velocity
+                            && std::abs(p.notes[k].duration - p.notes[n].duration) < 1.e-8;
+                check(repeated, "Rolling repeats its actual two-beat gates, accents and pitches");
+            }
+        }
+        check(longest - shortest > .10, "default Rolling has both detached and held notes");
+        for (auto style : {Style::deep, Style::funk}) {
+            s.style = style; p = generate(s, id);
+            check(p.notes[0].pitch == 36, "Start on root controls pitch even with a displaced first attack");
+            (style == Style::deep ? delayedDeep : delayedFunk) += p.notes[0].start > 0;
+            bool before = false, on = false;
+            for (int n = 0; n < p.count; ++n) {
+                int step = static_cast<int>(std::floor(p.notes[n].start * 4 + 1.e-7));
+                before |= step == 7; on |= step == 8;
+            }
+            (style == Style::deep ? anticipationDeep : anticipationFunk) += before && !on;
+        }
+    }
+    check(delayedDeep > 0 && delayedFunk > 0, "Deep and Funk can begin off the downbeat");
+    check(anticipationDeep > 0 && anticipationFunk > 0, "Deep and Funk can anticipate a beat without restriking it");
+}
 std::uint32_t be32(const std::vector<std::uint8_t>& bytes,std::size_t p) {
     return (std::uint32_t(bytes.at(p))<<24)|(std::uint32_t(bytes.at(p+1))<<16)|(std::uint32_t(bytes.at(p+2))<<8)|bytes.at(p+3);
 }
@@ -467,7 +539,7 @@ void schedulerTests() {
 }
 int main() {
     try {
-        generationTests(); musicalStructureTests(); midiTests(); schedulerTests();
+        rhythmicRoleTests(); phraseVocabularyTests(); generationTests(); musicalStructureTests(); midiTests(); schedulerTests();
         std::cout << "PASS: " << checks << " engine checks (generation, scales, locks, MIDI export, transport).\n";
         return 0;
     } catch(const std::exception& e) {

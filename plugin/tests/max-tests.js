@@ -8,6 +8,70 @@ let passed = 0;
 function test(name, fn) { fn(); console.log('PASS ' + name); passed++; }
 const settings = core.defaults();
 
+test('default unornamented Offbeat supplies all four between-kick pulses',()=>{
+  for(let i=0;i<128;i++) {
+    const p=core.generate({...settings,style:2,movement:0},(0xa341316c+Math.imul(i,2654435761))>>>0);
+    assert.equal(p.notes.length,4);
+    assert.deepEqual(p.notes.map(n=>n.start),[.5,1.5,2.5,3.5]);
+  }
+});
+test('Rolling repeats a two-beat gesture with detached and held notes',()=>{
+  for(let i=0;i<128;i++) {
+    const p=core.generate({...settings,style:1,movement:0},(0xa341316c+Math.imul(i,2654435761))>>>0);
+    const durations=p.notes.map(n=>n.duration);
+    assert.ok(Math.max(...durations)-Math.min(...durations)>.10,'short and long articulation');
+    for(const n of p.notes.filter(n=>n.start>=2)) {
+      const first=p.notes.find(a=>Math.abs(a.start+2-n.start)<1e-8);
+      assert.ok(first,'matching first-half attack');
+      assert.equal(n.pitch,first.pitch);
+      assert.equal(n.velocity,first.velocity);
+      assert.ok(Math.abs(n.duration-first.duration)<1e-8,'matching repeated gate');
+    }
+  }
+});
+test('Deep and Funk permit delayed arrivals and anticipated beats while starting on root',()=>{
+  for(const style of [0,5]) {
+    let delayed=0,anticipated=0;
+    for(let i=0;i<128;i++) {
+      const p=core.generate({...settings,style,movement:0},(0xa341316c+Math.imul(i,2654435761))>>>0);
+      assert.equal(p.notes[0].pitch,36);
+      delayed+=p.notes[0].start>0;
+      const steps=p.notes.map(n=>Math.floor(n.start*4+1e-7));
+      anticipated+=steps.includes(7)&&!steps.includes(8);
+    }
+    assert.ok(delayed>0,'delayed arrival, style '+style);
+    assert.ok(anticipated>0,'anticipation without restrike, style '+style);
+  }
+});
+test('Acid accents and held gates can vary independently',()=>{
+  let shortAccent=false,longUnaccented=false;
+  for(let i=0;i<128;i++) {
+    const p=core.generate({...settings,style:3,movement:0},(0xa341316c+Math.imul(i,2654435761))>>>0);
+    shortAccent=shortAccent||p.notes.some(n=>n.velocity>=108&&n.duration<.20);
+    longUnaccented=longUnaccented||p.notes.some(n=>n.velocity<105&&n.duration>.30);
+  }
+  assert.ok(shortAccent&&longUnaccented);
+});
+
+test('one-bar Melody can use both third and fifth in every style',()=>{
+  for(let style=0;style<6;style++) {
+    let complete=0;
+    for(let i=0;i<128;i++) {
+      const p=core.generate({...settings,style,movement:1,density:.85},(0xa341316c+Math.imul(i,2654435761))>>>0);
+      complete+=p.notes.some(n=>n.pitch%12===3)&&p.notes.some(n=>n.pitch%12===7);
+    }
+    assert.ok(complete>0,'one-bar triadic vocabulary, style '+style);
+  }
+});
+test('Deep can realize its enabled upper-tonic role',()=>{
+  let upper=0;
+  for(let i=0;i<128;i++) {
+    const p=core.generate({...settings,style:0,movement:1},(0xa341316c+Math.imul(i,2654435761))>>>0);
+    upper+=p.notes.some(n=>n.pitch===48);
+  }
+  assert.ok(upper>0);
+});
+
 test('new devices start at C1 with a one-bar loop',()=>{
   assert.equal(settings.root,0);assert.equal(settings.octave,1);assert.equal(settings.bars,1);
   const p=core.generate(settings,42);
