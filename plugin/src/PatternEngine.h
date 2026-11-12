@@ -35,6 +35,8 @@ struct Pattern {
 };
 Settings sanitise(Settings);
 bool isValid(const Pattern&) noexcept;
+// Transactional whole-phrase shift: no clipping, wrapping, or partial changes.
+bool transposeOctaves(Pattern&, int octaves) noexcept;
 Pattern generate(const Settings&, std::uint32_t seed, const Pattern* previous = nullptr, bool variation = false);
 std::string noteName(int pitch);
 std::vector<std::uint8_t> midiFile(const Pattern&);

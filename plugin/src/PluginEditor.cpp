@@ -378,16 +378,23 @@ public:
         for (int i = 0; i < 12; ++i) key.addItem(keys[(size_t)i], i + 1);
         scale.addItemList({"Minor", "Dorian", "Phrygian", "Major", "Minor pentatonic"}, 1);
         for (int bars : {1, 2, 4, 8}) length.addItem(juce::String(bars) + (bars == 1 ? " bar" : " bars"), bars);
-        octave.addItemList({"Sub", "Bass", "Upper"}, 1);
+        for (int shift = -5; shift <= 5; ++shift)
+            octave.addItem(shift == 0 ? "0 (original)" : (shift > 0 ? "+" : "") + juce::String(shift) + " oct", shift + 6);
         for (auto* box : {&style, &key, &scale, &length, &octave}) {
             addAndMakeVisible(*box); box->onChange = [this] { controlsChanged(); };
         }
         identify(style, "style", "Bassline style"); identify(key, "key", "Key"); identify(scale, "scale", "Scale");
-        identify(length, "length", "Loop length"); identify(octave, "octave", "Register");
+        identify(length, "length", "Loop length"); identify(octave, "octave", "Octave shift");
         key.setTooltip("Root note for new notes. Locked notes stay exactly as they are.");
         scale.setTooltip("Pitch collection for new notes. Choose the scale used by your track.");
         length.setTooltip("Loop length in 4/4. Generate applies the change. Locks beyond a shorter loop are removed.");
-        octave.setTooltip("Sub starts at MIDI 24, Bass at MIDI 36, Upper at MIDI 48, plus the selected key.");
+        octave.setTooltip("Shift this entire phrase immediately by up to five octaves, including locked notes. MIDI limits disable unavailable shifts. 0 restores the original register.");
+        octave.onChange = [this] {
+            if (updating) return;
+            const bool shifted = processor.setRegisterShift(octave.getSelectedId() - 6);
+            syncControls(); syncPattern();
+            status(shifted ? "Octave shift applied to playback and MIDI export." : "MIDI note limit: choose a smaller octave shift.");
+        };
 
         const std::array<const char*, 4> macroNames{"Density", "Swing", "Note length", "Melody"};
         const std::array<const char*, 4> macroIDs{"density", "swing", "gate", "movement"};
@@ -498,7 +505,7 @@ public:
         if (expanded) {
             g.setColour(border.withAlpha(.7f)); g.drawHorizontalLine(467, 28, 892);
             macroLabel(g, "Swing", 1, 28, 494, 190); macroLabel(g, "Note length", 2, 242, 494, 190);
-            labelText(g, "Register", {456, 494, 132, 22}, 13, muted);
+            labelText(g, "Octave shift", {456, 494, 132, 22}, 13, muted);
         }
         const auto pending = processor.hasPendingSettings();
         juce::String message = statusMessage;
@@ -538,7 +545,8 @@ private:
         int cropped = 0;
         for (int i = 0; i < old.count; ++i) if (old.notes[(size_t)i].locked && old.notes[(size_t)i].start + old.notes[(size_t)i].duration > beats + 1.e-9) ++cropped;
         const bool applied = processor.hasPendingSettings();
-        processor.generateNew(vary); syncPattern();
+        if (!processor.generateNew(vary)) { status("MIDI note limit: reduce Octave shift, then Generate."); return; }
+        syncPattern();
         status(cropped > 0 ? "Generated. " + juce::String(cropped) + " locked note(s) fell outside the shorter loop."
                : (vary && !applied ? "Phrase varied. Locked notes kept." : "New bassline generated."));
     }
@@ -548,7 +556,7 @@ private:
         auto s = processor.getSettings();
         s.style = static_cast<undertow::Style>(style.getSelectedId() - 1);
         s.root = key.getSelectedId() - 1; s.scale = static_cast<undertow::Scale>(scale.getSelectedId() - 1);
-        s.bars = length.getSelectedId(); s.octave = octave.getSelectedId() - 1;
+        s.bars = length.getSelectedId();
         s.density = (float)macros[0].getValue(); s.swing = (float)macros[1].getValue();
         s.gate = (float)macros[2].getValue(); s.movement = (float)macros[3].getValue();
         s.rootOnly = rootOnly.getToggleState(); s.anchorRoot = rootAnchor.getToggleState(); s.octaveJumps = octaves.getToggleState();
@@ -560,7 +568,7 @@ private:
         observedSettings = processor.getSettings(); const auto& s = observedSettings;
         key.setSelectedId(s.root + 1, juce::dontSendNotification); scale.setSelectedId((int)s.scale + 1, juce::dontSendNotification);
         style.setSelectedId((int)s.style + 1, juce::dontSendNotification);
-        length.setSelectedId(s.bars, juce::dontSendNotification); octave.setSelectedId(s.octave + 1, juce::dontSendNotification);
+        length.setSelectedId(s.bars, juce::dontSendNotification); octave.setSelectedId(processor.getRegisterShift() + 6, juce::dontSendNotification);
         macros[0].setValue(s.density, juce::dontSendNotification); macros[1].setValue(s.swing, juce::dontSendNotification);
         macros[2].setValue(s.gate, juce::dontSendNotification); macros[3].setValue(s.movement, juce::dontSendNotification);
         rootOnly.setToggleState(s.rootOnly, juce::dontSendNotification); rootAnchor.setToggleState(s.anchorRoot, juce::dontSendNotification);
@@ -571,6 +579,8 @@ private:
     {
         cachedRevision = processor.getRevision(); cachedPattern = processor.getPattern(); lockedCount = 0;
         for (int i = 0; i < cachedPattern.count; ++i) if (cachedPattern.notes[(size_t)i].locked) ++lockedCount;
+        octave.setSelectedId(processor.getRegisterShift() + 6, juce::dontSendNotification);
+        for (int shift = -5; shift <= 5; ++shift) octave.setItemEnabled(shift + 6, processor.canSetRegisterShift(shift));
         roll.setPattern(cachedPattern); clearLocks.setVisible(lockedCount > 0);
         undo.setEnabled(processor.canUndo()); redo.setEnabled(processor.canRedo());
         drag.setEnabled(cachedPattern.count > 0); variation.setEnabled(cachedPattern.count > 0 && !processor.hasPendingSettings()); repaint();

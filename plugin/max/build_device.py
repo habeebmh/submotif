@@ -171,6 +171,16 @@ obj('state','pattr patternState @bindto engine @parameter_enable 1',[448,300,375
 parameters['state']=['Pattern State','Pattern State',0]
 parameters['parameterbanks']={'0':{'index':0,'name':'Groove','parameters':['density','swing','gate','movement','root','scale','style','bars']}}
 parameters['inherited_shortname']=1
+for legacy in ('octave','label-octave'):
+    next(b['box'] for b in boxes if b['box']['id']==legacy)['presentation']=0
+
+# Append the new parameter so saved parameter indices retain their old meaning.
+# The old Octave parameter remains hidden for existing Live Sets and automation.
+menu('registerShift','Octave shift',
+     [str(i)+' oct' if i<0 else ('0 (original)' if i==0 else '+'+str(i)+' oct') for i in range(-5,6)],
+     5,1008,110,y=112,advanced=True,parameter_name='Octave shift',
+     hint='Shift the whole phrase immediately, including locks. MIDI limits reject unavailable shifts. 0 restores its original register.')
+
 
 patch={'patcher':{
     'fileversion':1,'appversion':{'major':8,'minor':6,'revision':5,'architecture':'x64','modernui':1},

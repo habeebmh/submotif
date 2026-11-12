@@ -439,6 +439,15 @@ bool isValid(const Pattern& p) noexcept {
     return true;
 }
 
+bool transposeOctaves(Pattern& p, int octaves) noexcept {
+    if (octaves < -5 || octaves > 5 || !isValid(p)) return false;
+    const int semitones = octaves * 12;
+    for (int i = 0; i < p.count; ++i)
+        if (p.notes[i].pitch + semitones < 0 || p.notes[i].pitch + semitones > 127) return false;
+    for (int i = 0; i < p.count; ++i) p.notes[i].pitch += semitones;
+    return true;
+}
+
 Pattern generate(const Settings& input, std::uint32_t seed, const Pattern* previous, bool variation) {
     const Settings s = sanitise(input);
     Random random(seed);

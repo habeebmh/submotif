@@ -208,13 +208,17 @@ int main(int argc, char* argv[])
 
         control<juce::Slider>(*editor, "swing").setValue(.42, juce::sendNotificationSync);
         control<juce::Slider>(*editor, "gate").setValue(.27, juce::sendNotificationSync);
-        control<juce::ComboBox>(*editor, "octave").setSelectedId(3, juce::sendNotificationSync);
+        auto& octave=control<juce::ComboBox>(*editor, "octave");
+        require(octave.getNumItems()==11&&octave.getSelectedId()==6,"Octave shift exposes -5 to +5 with zero default");
+        octave.setSelectedId(7, juce::sendNotificationSync);
+        auto raised=original;require(undertow::transposeOctaves(raised,1),"expected octave shift is valid");
+        require(processor.getRegisterShift()==1&&samePattern(raised,processor.getPattern()),"Octave shift immediately updates the phrase while other settings stay pending");
         auto& only = control<juce::ToggleButton>(*editor, "root-only");
         only.setToggleState(true, juce::sendNotificationSync);
         require(processor.hasPendingSettings(), "Detail edits are pending until generation");
         require(!control<juce::Button>(*editor, "variation").isEnabled(),
                 "Changing a few notes is disabled while setup changes are pending");
-        require(samePattern(original, processor.getPattern()), "Detail edits preserve the displayed phrase");
+        require(samePattern(raised, processor.getPattern()), "Pending detail edits preserve the shifted phrase");
         activate(*editor, "more-controls");
         checkDisclosure(*editor, false);
         require(editor->getWidth() <= originalSize.getWidth()
@@ -225,7 +229,7 @@ int main(int argc, char* argv[])
                 "Disclosure retains Swing");
         require(std::abs(control<juce::Slider>(*editor, "gate").getValue() - .27) < .00001,
                 "Disclosure retains note length");
-        require(control<juce::ComboBox>(*editor, "octave").getSelectedId() == 3
+        require(control<juce::ComboBox>(*editor, "octave").getSelectedId() == 7
                 && only.getToggleState(), "Disclosure retains pitch controls");
 
         auto& style = control<juce::ComboBox>(*editor, "style");
@@ -238,7 +242,7 @@ int main(int argc, char* argv[])
         require(processor.getSettings().style == undertow::Style::disco, "Style chooser selects Disco");
         control<juce::ComboBox>(*editor, "key").setSelectedId(8, juce::sendNotificationSync);
         control<juce::ComboBox>(*editor, "length").setSelectedId(4, juce::sendNotificationSync);
-        require(samePattern(original, processor.getPattern()), "Setup choices do not silently replace notes");
+        require(samePattern(raised, processor.getPattern()), "Setup choices do not silently replace notes");
         activate(*editor, "generate");
         const auto generated = processor.getPattern();
         require(!processor.hasPendingSettings(), "Generate commits chosen controls");

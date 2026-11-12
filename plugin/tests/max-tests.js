@@ -8,6 +8,23 @@ let passed = 0;
 function test(name, fn) { fn(); console.log('PASS ' + name); passed++; }
 const settings = core.defaults();
 
+test('whole-phrase shift supports all eleven offsets and rejects MIDI boundary overflow',()=>{
+  const p={lengthBeats:4,seed:17,notes:[{start:0,duration:.5,pitch:60,velocity:91,locked:true},{start:1.25,duration:.25,pitch:67,velocity:73,locked:false}]};
+  const original=JSON.stringify(p);
+  for(let shift=-5;shift<=5;shift++) {
+    const q=core.transposeOctaves(p,shift);assert.ok(q);
+    assert.deepEqual(q.notes,p.notes.map(n=>({...n,pitch:n.pitch+shift*12})));
+    assert.deepEqual(core.transposeOctaves(q,-shift),p);
+  }
+  for(const shift of [-6,6,NaN,Infinity,.5,'1'])assert.equal(core.transposeOctaves(p,shift),null);
+  for(const pitch of [0,127]) {
+    const edge=core.copy(p);edge.notes[1].pitch=pitch;
+    assert.equal(core.transposeOctaves(edge,pitch===0?-1:1),null);
+    assert.equal(edge.notes[0].pitch,60);
+  }
+  assert.equal(JSON.stringify(p),original,'canonical notes never mutate');
+});
+
 test('default unornamented Offbeat supplies all four between-kick pulses',()=>{
   for(let i=0;i<128;i++) {
     const p=core.generate({...settings,style:2,movement:0},(0xa341316c+Math.imul(i,2654435761))>>>0);
@@ -298,6 +315,39 @@ assert.ok(fs.existsSync(runtimePath),'Max runtime exists');
     vm.createContext(c);vm.runInContext(fs.readFileSync(runtimePath,'utf8'),c);
     return {c,events,ui,uiMessages};
   }
+  test('Max register shifts are immediate, reversible, saved and retained by generation',()=>{
+    const {c,ui}=runtime();c.loadbang();c.locknote(0);
+    const initial=JSON.parse(c.getvalueof()).pattern;
+    for(const shift of [5,2,-3,0]) {
+      c.cfg('registerShift',shift+5);assert.equal(c.registerShift,shift);
+      assert.deepEqual(JSON.parse(JSON.stringify(c.playbackPattern)),core.transposeOctaves(initial,shift));
+      assert.deepEqual(JSON.parse(c.getvalueof()).pattern,initial);
+      assert.equal(c.pending,false);
+    }
+    const state=c.getvalueof(),history=c.undoStack.length,revision=c.revision;
+    for(const shift of [-4,-5,6,NaN,.5])assert.equal(c.shiftregister(shift),false);
+    assert.equal(c.getvalueof(),state);assert.equal(c.undoStack.length,history);assert.equal(c.revision,revision);
+    assert.deepEqual(ui.registerShift,['set',5]);
+    c.shiftregister(5);const saved=c.getvalueof();c.undo();assert.equal(c.registerShift,0);c.redo();assert.equal(c.getvalueof(),saved);
+    const other=runtime();other.c.restore(saved);assert.equal(other.c.getvalueof(),saved);
+    const corrupt=JSON.parse(saved);corrupt.registerShift=6;other.c.restore(JSON.stringify(corrupt));assert.equal(other.c.getvalueof(),saved);
+    c.cfg('density',22);c.shiftregister(4);assert.equal(c.pending,true,'shift must not apply pending density');
+    c.generate();assert.equal(c.registerShift,4);assert.equal(c.pending,false);
+    assert.deepEqual(JSON.parse(JSON.stringify(c.playbackPattern)),core.transposeOctaves(JSON.parse(c.getvalueof()).pattern,4));
+    assert.equal(c.playbackPattern.notes[0].pitch,initial.notes[0].pitch+48,'generation retains shifted locked notes');
+    c.vary();assert.equal(c.registerShift,4);
+  });
+  test('Max register change releases held notes and exports the shifted phrase',()=>{
+    const {c,events}=runtime();const pattern={lengthBeats:4,seed:1,notes:[{start:0,duration:1,pitch:36,velocity:91,locked:true}]};
+    c.restore(JSON.stringify({version:1,settings,committed:settings,pattern,enabled:1}));c.hostPlaying=1;c.ppq=.1;c.pulse();events.length=0;
+    c.shiftregister(2);c.ppq=.11;c.pulse();
+    assert.deepEqual(events.filter(e=>e[0]===0).map(e=>e[1]),[128,36,0,144,60,91]);
+    let bytes;
+    c.File=function(){this.isopen=true;this.writebytes=b=>{bytes=Array.from(b);};this.close=()=>{};};
+    c.beginexport();c.shiftregister(3);c.exportfile('/tmp/shift.mid');
+    assert.deepEqual(bytes,core.midiFile(core.transposeOctaves(pattern,2)),'export dialog keeps the exact displayed snapshot');
+    c.exportfile('/tmp/current.mid');assert.deepEqual(bytes,core.midiFile(core.transposeOctaves(pattern,3)));
+  });
   test('Max runtime state round-trip retains exact notes/locks/settings',()=>{
     const {c}=runtime();c.loadbang();c.generate();c.locknote(0);
     const state=c.getvalueof();c.generate();c.setvalueof(state);
@@ -364,7 +414,7 @@ assert.ok(fs.existsSync(runtimePath),'Max runtime exists');
   test('lock-only undo, redo, and seed-only restore do not retrigger held notes',()=>{
     const {c,events}=runtime();
     c.pattern={lengthBeats:8,seed:1,notes:[{start:0,duration:1,pitch:36,velocity:99,locked:false}]};
-    c.hostPlaying=1;c.ppq=.1;c.pulse();events.length=0;
+    c.broadcast();c.hostPlaying=1;c.ppq=.1;c.pulse();events.length=0;
     const revision=c.revision;
     c.locknote(0);c.undo();c.redo();c.unlock();c.undo();c.pulse();
     assert.equal(c.revision,revision);
@@ -415,7 +465,7 @@ assert.ok(fs.existsSync(runtimePath),'Max runtime exists');
     API.prototype.get=function(k){if(k==='canonical_parent')return ['id',nodes[this.id].parent];if(k==='scenes')return ['id',55,'id',56,'id',3];return [0];};
     API.prototype.call=function(...a){calls.push([this.request,...a]);return [];};
     API.prototype.set=function(...a){calls.push([this.request,'set',...a]);};
-    const {c}=runtime(API);c.loadbang();c.ready();const pattern=JSON.parse(c.getvalueof()).pattern;c.createclip();
+    const {c}=runtime(API);c.loadbang();c.ready();c.shiftregister(2);const pattern=JSON.parse(JSON.stringify(c.playbackPattern));c.createclip();
     const add=calls.find(a=>a[1]==='add_new_notes');assert.ok(add);
     assert.equal(add[0],'live_set tracks 3 clip_slots 2 clip');
     const notes=JSON.parse(add[2]).notes;assert.equal(notes.length,pattern.notes.length);
@@ -460,11 +510,14 @@ test('Max presentation keeps core workflow compact and secondary controls hidden
   assert.equal(p.devicewidth,1000);assert.equal(p.openrect[3],169);
   assert.equal(box('root').saved_attribute_attributes.valueof.parameter_initial[0],0);
   assert.equal(box('octave').saved_attribute_attributes.valueof.parameter_initial[0],1);
+  assert.equal(box('registerShift').saved_attribute_attributes.valueof.parameter_initial[0],5);
+  assert.equal(box('registerShift').items.length,11);
+  assert.equal(box('octave').presentation,0,'legacy base register stays out of the new UI');
   assert.equal(box('bars').saved_attribute_attributes.valueof.parameter_initial[0],0);
   assert.equal(box('vary').text,'Change a few notes');
   const generate=box('generate').presentation_rect,vary=box('vary').presentation_rect;
   assert.ok(vary[1]-(generate[1]+generate[3])<=6,'related generation actions stay together');
-  for(const id of ['octave','swing','gate','rootOnly','anchorRoot','octaveJumps','panic'])assert.equal(box(id).hidden,1);
+  for(const id of ['octave','registerShift','swing','gate','rootOnly','anchorRoot','octaveJumps','panic'])assert.equal(box(id).hidden,1);
   for(const id of ['density','movement','swing','gate']) {
     assert.equal(box(id).maxclass,'live.slider');assert.equal(box(id).orientation,1);
   }

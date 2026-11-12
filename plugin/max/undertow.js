@@ -6,11 +6,12 @@ include('undertow-core.js');
 var core=UndertowCore;
 var settings=core.defaults(),committed=core.copy(settings);
 var pattern=core.generate(settings,(new Date().getTime()>>>0)||1);
+var registerShift=0,playbackPattern=core.copy(pattern);
 var scheduler=new core.Scheduler(),revision=1,enabled=1,deviceEnabled=1,hostPlaying=0,ppq=0;
 var apiReady=false,pending=false,undoStack=[],redoStack=[],exportPattern=null;
 var detailsOpen=false;
-var detailControls=['octave','swing','gate','rootOnly','anchorRoot','octaveJumps','action_panic'];
-var detailLabels=['advanced-divider','advanced-title','label-octave',
+var detailControls=['registerShift','swing','gate','rootOnly','anchorRoot','octaveJumps','action_panic'];
+var detailLabels=['advanced-divider','advanced-title','label-registerShift',
     'label-swing','value-swing','label-gate','value-gate'];
 var lastDraw=0;
 var rootNames=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -44,7 +45,8 @@ function applyDisclosure() {
 }
 function details() {detailsOpen=!detailsOpen;applyDisclosure();}
 function broadcast() {
-    outlet(1,'pattern',JSON.stringify(pattern));
+    playbackPattern=core.transposeOctaves(pattern,registerShift);
+    outlet(1,'pattern',JSON.stringify(playbackPattern));
     var bars=pattern.lengthBeats/4,locks=0,i;
     for(i=0;i<pattern.notes.length;i++)if(pattern.notes[i].locked)locks++;
     ui('summary','set',rootNames[committed.root]+' '+scaleNames[committed.scale]+'  ·  '+bars+(bars===1?' bar':' bars')+'  ·  '+pattern.notes.length+' notes');
@@ -62,6 +64,7 @@ function broadcast() {
 function syncControls() {
     var keys=['root','scale','style','octave'],i;
     for(i=0;i<keys.length;i++)ui(keys[i],'set',settings[keys[i]]);
+    ui('registerShift','set',registerShift+5);
     ui('bars','set',[1,2,4,8].indexOf(settings.bars));
     keys=['density','swing','gate','movement'];
     for(i=0;i<keys.length;i++)ui(keys[i],'set',Math.round(settings[keys[i]]*100));
@@ -73,6 +76,7 @@ function loadbang() {syncControls();applyDisclosure();broadcast();}
 function ready() {apiReady=true;flush();syncControls();applyDisclosure();broadcast();}
 function changed() {notifyclients();broadcast();}
 function cfg(name,value) {
+    if(name==='registerShift'){shiftregister(Number(value)-5);return;}
     if(!settings.hasOwnProperty(name))return;
     if(name==='bars')value=[1,2,4,8][Math.max(0,Math.min(3,Math.round(value)))];
     else if(name==='density'||name==='swing'||name==='gate'||name==='movement')value=Number(value)/100;
@@ -84,13 +88,24 @@ function cfg(name,value) {
 }
 function checkpoint() {undoStack.push(getvalueof());if(undoStack.length>32)undoStack.shift();redoStack=[];}
 function make(variation) {
-    checkpoint();
     var next=(pattern.seed+2654435769)>>>0;
     // Only Generate applies pending settings. Variation always edits this motif.
     var generated=core.generate(settings,next,pattern,variation&&!pending);
+    if(!core.transposeOctaves(generated,registerShift)){status('MIDI note limit: reduce Octave shift, then Generate.');return;}
+    checkpoint();
     if(!core.samePlayback(pattern,generated)){flush();revision++;}
     pattern=generated;
     committed=core.copy(settings);pending=false;changed();
+}
+function shiftregister(octaves) {
+    if(!core.transposeOctaves(pattern,octaves)){
+        ui('registerShift','set',registerShift+5);
+        status('MIDI note limit: choose a smaller octave shift.');return false;
+    }
+    if(octaves===registerShift)return true;
+    checkpoint();flush();registerShift=octaves;revision++;
+    ui('registerShift','set',registerShift+5);changed();
+    status('Octave shift applied to playback, clips and MIDI export.');return true;
 }
 function generate() {make(false);}
 function vary() {
@@ -126,30 +141,36 @@ function deviceactive(v) {
 function position(ticks) {ppq=Number(ticks)/480;}
 function playing(v) {hostPlaying=Number(v)!==0?1:0;if(!hostPlaying)flush();}
 function pulse() {
-    midi(scheduler.process(pattern,ppq,!!hostPlaying,!!enabled&&!!deviceEnabled,revision));
+    midi(scheduler.process(playbackPattern,ppq,!!hostPlaying,!!enabled&&!!deviceEnabled,revision));
     var now=new Date().getTime();
     if(now-lastDraw>32) {outlet(1,'playhead',hostPlaying&&enabled&&deviceEnabled?ppq%pattern.lengthBeats:-1);ui('transport','set',hostPlaying?'Playing':'Stopped');lastDraw=now;}
 }
 function freebang() {flush();}
-function getvalueof() {return JSON.stringify({version:1,settings:settings,committed:committed,pattern:pattern,enabled:enabled});}
+function getvalueof() {
+    var saved={version:1,settings:settings,committed:committed,pattern:pattern,enabled:enabled};
+    if(registerShift!==0)saved.registerShift=registerShift;
+    return JSON.stringify(saved);
+}
 function restore(text) {
     try {
         if(typeof text!=='string'||text.length>100000)throw new Error('State is not valid');
         var saved=JSON.parse(text);
         if(saved.version!==1||!core.valid(saved.pattern))throw new Error('Invalid pattern');
+        var shift=typeof saved.registerShift==='undefined'?0:saved.registerShift;
+        if(!core.transposeOctaves(saved.pattern,shift))throw new Error('Invalid octave shift');
         var clean=core.sanitise(saved.settings),c=core.sanitise(saved.committed);
         var nextEnabled=saved.enabled?1:0,wasGenerating=enabled&&deviceEnabled;
-        if(!core.samePlayback(pattern,saved.pattern)||nextEnabled!==enabled){flush();revision++;}
-        settings=clean;committed=c;pattern=core.copy(saved.pattern);enabled=nextEnabled;
+        if(shift!==registerShift||!core.samePlayback(pattern,saved.pattern)||nextEnabled!==enabled){flush();revision++;}
+        settings=clean;committed=c;pattern=core.copy(saved.pattern);registerShift=shift;enabled=nextEnabled;
         if(!wasGenerating&&enabled&&deviceEnabled)alloff();
         pending=JSON.stringify(settings)!==JSON.stringify(committed);
         syncControls();changed();
     } catch(e) {status('Saved state rejected — current pattern kept');}
 }
 function setvalueof(value) {restore(String(value));}
-function beginexport() {exportPattern=core.copy(pattern);outlet(3,'bang');}
+function beginexport() {exportPattern=core.copy(playbackPattern);outlet(3,'bang');}
 function exportfile() {
-    var path=arrayfromargs(arguments).join(' '),p=exportPattern||pattern;exportPattern=null;
+    var path=arrayfromargs(arguments).join(' '),p=exportPattern||playbackPattern;exportPattern=null;
     if(!path)return;
     var file=null;
     try {
@@ -187,7 +208,7 @@ function createclip() {
         var slotPath=trackPath+' clip_slots '+sceneIndex;slot=new LiveAPI(null,slotPath);
         if(!slot.id)throw new Error('No clip slot exists in the selected scene');
         if(Number(valueOf(slot.get('has_clip'))))throw new Error('That scene already has a clip on this track — select an empty scene');
-        var snapshot=core.copy(pattern),notes=[];
+        var snapshot=core.copy(playbackPattern),notes=[];
         for(var i=0;i<snapshot.notes.length;i++){var n=snapshot.notes[i];notes.push({pitch:n.pitch,start_time:n.start,duration:n.duration,velocity:n.velocity,mute:0,probability:1});}
         slot.call('create_clip',snapshot.lengthBeats);created=true;
         var clip=new LiveAPI(null,slotPath+' clip');

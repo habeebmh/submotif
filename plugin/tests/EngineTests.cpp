@@ -42,6 +42,27 @@ bool inScale(int pitch, const Settings& s) {
     const auto& scale = scales[static_cast<int>(s.scale)];
     return std::find(scale.begin(),scale.end(),degree)!=scale.end();
 }
+void transposeTests() {
+    Pattern original;original.count=2;original.lengthBeats=4;original.seed=17;
+    original.notes[0]={0,.5,60,91,true};original.notes[1]={1.25,.25,67,73,false};
+    for(int shift=-5;shift<=5;++shift) {
+        auto moved=original;check(transposeOctaves(moved,shift),"all eleven octave positions are available when pitches fit");
+        for(int i=0;i<moved.count;++i) {
+            auto expected=original.notes[i];expected.pitch+=shift*12;
+            check(sameNote(expected,moved.notes[i]),"transpose preserves exact rhythm, velocity and locks");
+        }
+        check(moved.seed==original.seed && moved.lengthBeats==original.lengthBeats,"transpose is not generation");
+        check(transposeOctaves(moved,-shift)&&samePattern(original,moved),"transpose is losslessly reversible");
+    }
+    for(int pitch : {0,127}) {
+        auto edge=original;edge.notes[1].pitch=pitch;auto before=edge;
+        check(!transposeOctaves(edge,pitch==0?-1:1)&&samePattern(edge,before),"MIDI boundary failure cannot shift only part of a phrase");
+    }
+    for(int shift : {-6,6,1000000}) {
+        auto unchanged=original;check(!transposeOctaves(unchanged,shift)&&samePattern(unchanged,original),"unsupported shifts are rejected without mutation");
+    }
+}
+
 void generationTests() {
     Settings s;
     check(s.root == 0 && s.octave == 1 && s.bars == 1, "New phrases default to C1 and one bar");
@@ -539,7 +560,7 @@ void schedulerTests() {
 }
 int main() {
     try {
-        rhythmicRoleTests(); phraseVocabularyTests(); generationTests(); musicalStructureTests(); midiTests(); schedulerTests();
+        transposeTests(); rhythmicRoleTests(); phraseVocabularyTests(); generationTests(); musicalStructureTests(); midiTests(); schedulerTests();
         std::cout << "PASS: " << checks << " engine checks (generation, scales, locks, MIDI export, transport).\n";
         return 0;
     } catch(const std::exception& e) {

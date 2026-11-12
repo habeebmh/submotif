@@ -36,7 +36,10 @@ public:
     undertow::Pattern getPattern() const;
     bool hasPendingSettings() const;
     void setSettings(undertow::Settings); // Updates controls; Generate applies them.
-    void generateNew(bool variation = false);
+    bool generateNew(bool variation = false);
+    int getRegisterShift() const;
+    bool canSetRegisterShift(int octaves) const;
+    bool setRegisterShift(int octaves);
     void toggleLock(int noteIndex);
     void clearLocks();
     void undo();
@@ -55,14 +58,15 @@ public:
     void panic() noexcept { panicRequested.store(true); }
 
 private:
-    struct Snapshot { undertow::Settings settings, committedSettings; undertow::Pattern pattern; };
+    struct Snapshot { undertow::Settings settings, committedSettings; undertow::Pattern pattern; int registerShift; };
     void remember();
-    void commitPattern(const undertow::Pattern&);
+    void commitPattern(const undertow::Pattern&, int shift);
     void process(juce::AudioBuffer<float>&, juce::MidiBuffer&, bool bypassed);
     mutable std::mutex stateMutex;
     undertow::Settings settings;
     undertow::Settings committedSettings;
     undertow::Pattern pattern;
+    int registerShift = 0; // Canonical notes stay in the generation register.
     std::deque<Snapshot> undoStack, redoStack;
     undertow::Pattern audioPattern;
     undertow::Scheduler scheduler;

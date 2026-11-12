@@ -84,6 +84,8 @@ void UndertowProcessor::process(juce::AudioBuffer<float>& buffer,juce::MidiBuffe
         const std::unique_lock<std::mutex> lock(stateMutex,std::try_to_lock);
         if(lock.owns_lock()) {
             audioPattern=pattern;
+            const bool validShift=undertow::transposeOctaves(audioPattern,registerShift);
+            jassert(validShift);juce::ignoreUnused(validShift);
             audioRevision=playbackRevision.load(std::memory_order_relaxed);
         }
     }
@@ -116,35 +118,54 @@ void UndertowProcessor::process(juce::AudioBuffer<float>& buffer,juce::MidiBuffe
 }
 
 undertow::Settings UndertowProcessor::getSettings() const { const std::lock_guard<std::mutex> lock(stateMutex);return settings; }
-undertow::Pattern UndertowProcessor::getPattern() const { const std::lock_guard<std::mutex> lock(stateMutex);return pattern; }
+undertow::Pattern UndertowProcessor::getPattern() const {
+    const std::lock_guard<std::mutex> lock(stateMutex);
+    auto output=pattern;const bool validShift=undertow::transposeOctaves(output,registerShift);
+    jassert(validShift);juce::ignoreUnused(validShift);return output;
+}
+int UndertowProcessor::getRegisterShift() const { const std::lock_guard<std::mutex> lock(stateMutex);return registerShift; }
+bool UndertowProcessor::canSetRegisterShift(int octaves) const {
+    const std::lock_guard<std::mutex> lock(stateMutex);
+    auto output=pattern;return undertow::transposeOctaves(output,octaves);
+}
+bool UndertowProcessor::setRegisterShift(int octaves) {
+    {
+        const std::lock_guard<std::mutex> lock(stateMutex);
+        auto output=pattern;if(!undertow::transposeOctaves(output,octaves)) return false;
+        if(octaves==registerShift) return true;
+        remember();commitPattern(pattern,octaves);
+    }
+    updateHostDisplay(ChangeDetails().withNonParameterStateChanged(true));return true;
+}
 bool UndertowProcessor::hasPendingSettings() const { const std::lock_guard<std::mutex> lock(stateMutex);return !sameSettings(settings,committedSettings); }
 void UndertowProcessor::setSettings(undertow::Settings newSettings) {
     {const std::lock_guard<std::mutex> lock(stateMutex);settings=undertow::sanitise(newSettings);}
     updateHostDisplay(ChangeDetails().withNonParameterStateChanged(true));
 }
 void UndertowProcessor::remember() {
-    undoStack.push_back({settings,committedSettings,pattern});
+    undoStack.push_back({settings,committedSettings,pattern,registerShift});
     if(undoStack.size()>64) undoStack.pop_front();
     redoStack.clear();
 }
-void UndertowProcessor::commitPattern(const undertow::Pattern& newPattern) {
-    const bool playbackChanged=!samePlayback(pattern,newPattern);
-    pattern=newPattern;
+void UndertowProcessor::commitPattern(const undertow::Pattern& newPattern,int shift) {
+    const bool playbackChanged=registerShift!=shift || !samePlayback(pattern,newPattern);
+    pattern=newPattern;registerShift=shift;
     revision.fetch_add(1,std::memory_order_release);
     if(playbackChanged) playbackRevision.fetch_add(1,std::memory_order_release);
 }
-void UndertowProcessor::generateNew(bool variation) {
+bool UndertowProcessor::generateNew(bool variation) {
     {
         const std::lock_guard<std::mutex> lock(stateMutex);
-        remember();
         auto seed=static_cast<std::uint32_t>(random.nextInt());
         if(seed==pattern.seed) ++seed;
         // A retained motif cannot express new rhythm/gate/style settings.
         const auto next=undertow::generate(settings,seed,&pattern,
             variation && sameSettings(settings,committedSettings));
-        if(undertow::isValid(next)) { committedSettings=settings;commitPattern(next); }
+        auto output=next;
+        if(!undertow::transposeOctaves(output,registerShift)) return false;
+        remember();committedSettings=settings;commitPattern(next,registerShift);
     }
-    updateHostDisplay(ChangeDetails().withNonParameterStateChanged(true));
+    updateHostDisplay(ChangeDetails().withNonParameterStateChanged(true));return true;
 }
 void UndertowProcessor::toggleLock(int index) {
     {
@@ -168,18 +189,18 @@ void UndertowProcessor::clearLocks() {
 void UndertowProcessor::undo() {
     {
         const std::lock_guard<std::mutex> lock(stateMutex);if(undoStack.empty()) return;
-        redoStack.push_back({settings,committedSettings,pattern});
+        redoStack.push_back({settings,committedSettings,pattern,registerShift});
         const auto snapshot=undoStack.back();undoStack.pop_back();
-        settings=snapshot.settings;committedSettings=snapshot.committedSettings;commitPattern(snapshot.pattern);
+        settings=snapshot.settings;committedSettings=snapshot.committedSettings;commitPattern(snapshot.pattern,snapshot.registerShift);
     }
     updateHostDisplay(ChangeDetails().withNonParameterStateChanged(true));
 }
 void UndertowProcessor::redo() {
     {
         const std::lock_guard<std::mutex> lock(stateMutex);if(redoStack.empty()) return;
-        undoStack.push_back({settings,committedSettings,pattern});
+        undoStack.push_back({settings,committedSettings,pattern,registerShift});
         const auto snapshot=redoStack.back();redoStack.pop_back();
-        settings=snapshot.settings;committedSettings=snapshot.committedSettings;commitPattern(snapshot.pattern);
+        settings=snapshot.settings;committedSettings=snapshot.committedSettings;commitPattern(snapshot.pattern,snapshot.registerShift);
     }
     updateHostDisplay(ChangeDetails().withNonParameterStateChanged(true));
 }
@@ -192,6 +213,7 @@ void UndertowProcessor::getStateInformation(juce::MemoryBlock& data) {
     {
         const std::lock_guard<std::mutex> lock(stateMutex);
         state.setAttribute("version",1);state.setAttribute("enabled",enabled.load());
+        state.setAttribute("registerShift",registerShift);
         state.addChildElement(writeSettings("Settings",settings).release());
         state.addChildElement(writeSettings("CommittedSettings",committedSettings).release());
         auto* p=state.createNewChildElement("Pattern");
@@ -221,11 +243,14 @@ void UndertowProcessor::setStateInformation(const void* data,int size) {
         note.start=readExactNumber(*n,"start");note.duration=readExactNumber(*n,"duration");
         note.pitch=n->getIntAttribute("pitch",-1);note.velocity=n->getIntAttribute("velocity",0);note.locked=n->getBoolAttribute("locked",false);
     }
-    if(!undertow::isValid(incoming)) return;
+    const double savedShift=state->hasAttribute("registerShift") ? readExactNumber(*state,"registerShift") : 0.0;
+    if(!std::isfinite(savedShift)||savedShift!=std::floor(savedShift)||savedShift < -5||savedShift > 5) return;
+    const int incomingShift=static_cast<int>(savedShift);
+    auto output=incoming;if(!undertow::transposeOctaves(output,incomingShift)) return;
     {
         const std::lock_guard<std::mutex> lock(stateMutex);
         settings=readSettings(*s);committedSettings=readSettings(*c);
-        undoStack.clear();redoStack.clear();commitPattern(incoming);
+        undoStack.clear();redoStack.clear();commitPattern(incoming,incomingShift);
         enabled.store(state->getBoolAttribute("enabled",true));
     }
 }

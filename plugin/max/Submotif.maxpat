@@ -803,7 +803,7 @@
           ],
           "numinlets": 1,
           "numoutlets": 0,
-          "presentation": 1,
+          "presentation": 0,
           "presentation_rect": [
             1008,
             93,
@@ -835,7 +835,7 @@
           ],
           "numinlets": 1,
           "numoutlets": 3,
-          "presentation": 1,
+          "presentation": 0,
           "presentation_rect": [
             1008,
             112,
@@ -3194,6 +3194,144 @@
             "parameter_enable": 1
           }
         }
+      },
+      {
+        "box": {
+          "id": "label-registerShift",
+          "maxclass": "comment",
+          "patching_rect": [
+            1008,
+            93,
+            110,
+            17
+          ],
+          "numinlets": 1,
+          "numoutlets": 0,
+          "presentation": 1,
+          "presentation_rect": [
+            1008,
+            93,
+            110,
+            17
+          ],
+          "text": "Octave shift",
+          "fontsize": 11,
+          "fontname": "Avenir Next",
+          "textcolor": [
+            0.6549019607843137,
+            0.6862745098039216,
+            0.6784313725490196,
+            1.0
+          ],
+          "hidden": 1,
+          "varname": "label-registerShift"
+        }
+      },
+      {
+        "box": {
+          "id": "registerShift",
+          "maxclass": "live.menu",
+          "patching_rect": [
+            1008,
+            112,
+            110,
+            22
+          ],
+          "numinlets": 1,
+          "numoutlets": 3,
+          "presentation": 1,
+          "presentation_rect": [
+            1008,
+            112,
+            110,
+            22
+          ],
+          "varname": "registerShift",
+          "parameter_enable": 1,
+          "saved_attribute_attributes": {
+            "valueof": {
+              "parameter_longname": "Octave shift",
+              "parameter_shortname": "Octave shift",
+              "parameter_type": 2,
+              "parameter_initial_enable": 1,
+              "parameter_initial": [
+                5
+              ],
+              "parameter_order": 0,
+              "parameter_mmin": 0,
+              "parameter_mmax": 10,
+              "parameter_enum": [
+                "-5 oct",
+                "-4 oct",
+                "-3 oct",
+                "-2 oct",
+                "-1 oct",
+                "0 (original)",
+                "+1 oct",
+                "+2 oct",
+                "+3 oct",
+                "+4 oct",
+                "+5 oct"
+              ]
+            }
+          },
+          "items": [
+            "-5 oct",
+            "-4 oct",
+            "-3 oct",
+            "-2 oct",
+            "-1 oct",
+            "0 (original)",
+            "+1 oct",
+            "+2 oct",
+            "+3 oct",
+            "+4 oct",
+            "+5 oct"
+          ],
+          "fontsize": 11,
+          "fontname": "Avenir Next",
+          "bgcolor": [
+            0.1411764705882353,
+            0.1568627450980392,
+            0.16470588235294117,
+            1.0
+          ],
+          "activebgcolor": [
+            0.1411764705882353,
+            0.1568627450980392,
+            0.16470588235294117,
+            1.0
+          ],
+          "textcolor": [
+            0.9411764705882353,
+            0.9490196078431372,
+            0.9294117647058824,
+            1.0
+          ],
+          "activetextcolor": [
+            0.9411764705882353,
+            0.9490196078431372,
+            0.9294117647058824,
+            1.0
+          ],
+          "hidden": 1,
+          "hint": "Shift the whole phrase immediately, including locks. MIDI limits reject unavailable shifts. 0 restores its original register."
+        }
+      },
+      {
+        "box": {
+          "id": "cfg-registerShift",
+          "maxclass": "newobj",
+          "patching_rect": [
+            20,
+            2260,
+            180,
+            22
+          ],
+          "numinlets": 1,
+          "numoutlets": 1,
+          "text": "prepend cfg registerShift"
+        }
       }
     ],
     "lines": [
@@ -4000,6 +4138,30 @@
             0
           ]
         }
+      },
+      {
+        "patchline": {
+          "source": [
+            "registerShift",
+            0
+          ],
+          "destination": [
+            "cfg-registerShift",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "cfg-registerShift",
+            0
+          ],
+          "destination": [
+            "engine",
+            0
+          ]
+        }
       }
     ],
     "parameters": {
@@ -4134,7 +4296,12 @@
           ]
         }
       },
-      "inherited_shortname": 1
+      "inherited_shortname": 1,
+      "registerShift": [
+        "Octave shift",
+        "Octave shift",
+        0
+      ]
     },
     "latency": 0,
     "dependency_cache": [

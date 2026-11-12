@@ -35,6 +35,14 @@ var UndertowCore = (function () {
         }
         return true;
     }
+    function transposeOctaves(p,octaves) {
+        if(typeof octaves!=='number'||!isFinite(octaves)||octaves!==Math.floor(octaves)||octaves < -5||octaves > 5||!valid(p))return null;
+        var semitones=octaves*12,i;
+        for(i=0;i<p.notes.length;i++)if(p.notes[i].pitch+semitones<0||p.notes[i].pitch+semitones>127)return null;
+        var shifted=copy(p);
+        for(i=0;i<shifted.notes.length;i++)shifted.notes[i].pitch+=semitones;
+        return shifted;
+    }
     function contains(a,x) { return a.indexOf(x)>=0; }
     function samePlayback(a,b) {
         if(!a||!b||a.lengthBeats!==b.lengthBeats||a.notes.length!==b.notes.length)return false;
@@ -474,6 +482,6 @@ var UndertowCore = (function () {
         }
         this.last=ppq;this.running=true;this.revision=revision;return events;
     };
-    return {scales:scales,defaults:defaults,sanitise:sanitise,generate:generate,valid:valid,samePlayback:samePlayback,midiFile:midiFile,Scheduler:Scheduler,copy:copy};
+    return {scales:scales,defaults:defaults,sanitise:sanitise,generate:generate,valid:valid,transposeOctaves:transposeOctaves,samePlayback:samePlayback,midiFile:midiFile,Scheduler:Scheduler,copy:copy};
 }());
 if(typeof module!=='undefined' && module.exports)module.exports=UndertowCore;

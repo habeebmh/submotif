@@ -10,6 +10,8 @@ SUBMOTIF is a free, open-source MIDI bassline generator for house music. Choose 
 
 [Website](https://submotif.web.app) · [GitHub](https://github.com/habeebmh/submotif) · [Latest release](https://github.com/habeebmh/submotif/releases/latest) · [Contribute](docs/CONTRIBUTING.md) · [Report an issue](https://github.com/habeebmh/submotif/issues)
 
+**On main (v1.3.0 source/local builds):** immediate octave shifting is available under More controls. The latest public binary release remains v1.2.2.
+
 Listen to [six selected examples](https://submotif.web.app/#showcase), including Acid through Serum at the approved higher register. These recordings demonstrate MIDI played through instruments; the plugin itself supplies MIDI only.
 
 ## Make it yours
@@ -68,7 +70,8 @@ Clicking **Drag MIDI**, or choosing **Help → Save MIDI**, opens a file export.
 | **Melody** | Changes how much the pitches move. |
 | **Change a few notes** | Keeps the rhythm and most notes while making a small variation. Apply pending settings with Generate first. |
 | **Click a note** | Locks or unlocks it. Locked notes survive generation and variation. Shortening a loop removes locks that no longer fit. |
-| **More controls** | Reveals Swing, Note length, Register, Root notes only, Start on root, and Octave jumps. |
+| **More controls** | Reveals Swing, Note length, Octave shift, Root notes only, Start on root, and Octave jumps. |
+| **Octave shift** | In v1.3.0 source/local builds, instantly moves the whole phrase −5 to +5 octaves, within MIDI limits. Applies to locked notes, playback and export; Undo/Redo and saved projects retain it. |
 
 **Root notes only** keeps new notes on the tonic pitch class; **Octave jumps** permits its upper octave. **Start on root** makes the first sounded note the tonic when that note is unlocked, without moving it onto the downbeat. Locks take priority over new pitch settings. C1 uses Ableton's octave convention: MIDI note 36.
 

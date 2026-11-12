@@ -35,6 +35,56 @@ std::vector<unsigned char> midiBytes(const juce::MidiBuffer& buffer) {
     }
     return bytes;
 }
+void checkRegisterShift() {
+    UndertowProcessor p;
+    auto settings=p.getSettings();settings.rootOnly=true;settings.octaveJumps=false;
+    p.setSettings(settings);require(p.generateNew(),"generate at default register");p.toggleLock(0);
+    const auto original=p.getPattern();
+    require(p.getRegisterShift()==0,"new devices use original C1 register");
+    for(int shift : {5,2,-3,0}) {
+        require(p.setRegisterShift(shift),"valid register change succeeds");
+        auto expected=original;require(undertow::transposeOctaves(expected,shift),"expected transposition is valid");
+        require(sameNotes(expected,p.getPattern()),"register immediately shifts all notes including locks without accumulating offsets");
+    }
+    const auto revision=p.getRevision();
+    require(!p.setRegisterShift(-4)&&!p.setRegisterShift(6),"invalid register changes fail");
+    require(p.getRevision()==revision&&sameNotes(original,p.getPattern()),"rejection leaves the phrase unchanged");
+    require(p.setRegisterShift(5),"raise five octaves");p.undo();
+    require(p.getRegisterShift()==0&&sameNotes(original,p.getPattern()),"undo restores register and exact notes");p.redo();
+    require(p.getRegisterShift()==5,"redo restores register");
+    settings.density=.2f;p.setSettings(settings);require(p.hasPendingSettings(),"independent generation settings remain pending");
+    require(p.setRegisterShift(4)&&p.hasPendingSettings(),"transposition must not apply unrelated pending settings");
+    require(p.generateNew()&&p.getRegisterShift()==4&&!p.hasPendingSettings(),"Generate retains the chosen shift");
+    for(int i=0;i<p.getPattern().count;++i)require(p.getPattern().notes[i].pitch==84,"new notes use shifted C5 register");
+    juce::MemoryBlock saved;p.getStateInformation(saved);UndertowProcessor restored;
+    restored.setStateInformation(saved.getData(),static_cast<int>(saved.getSize()));
+    require(restored.getRegisterShift()==4&&sameNotes(restored.getPattern(),p.getPattern()),"project state retains shifted notes exactly");
+    auto xml=juce::AudioProcessor::getXmlFromBinary(saved.getData(),static_cast<int>(saved.getSize()));
+    xml->setAttribute("registerShift",6);juce::MemoryBlock invalid;juce::AudioProcessor::copyXmlToBinary(*xml,invalid);
+    restored.setStateInformation(invalid.getData(),static_cast<int>(invalid.getSize()));
+    require(restored.getRegisterShift()==4,"invalid saved shift does not replace current state");
+    xml->removeAttribute("registerShift");juce::AudioProcessor::copyXmlToBinary(*xml,invalid);
+    restored.setStateInformation(invalid.getData(),static_cast<int>(invalid.getSize()));
+    require(restored.getRegisterShift()==0&&restored.getPattern().notes[0].pitch==36,"older projects without shift keep their original register");
+
+    // A held note must release at its old pitch before the shifted note sounds.
+    p.setRegisterShift(0);TestPlayHead host;host.position.setBpm(120);host.position.setIsPlaying(true);
+    const auto first=p.getPattern().notes[0];host.position.setPpqPosition(first.start+.001);
+    p.setPlayHead(&host);p.prepareToPlay(48000,16);juce::AudioBuffer<float> audio(2,16);juce::MidiBuffer events;
+    p.processBlock(audio,events);require(!events.isEmpty(),"initial held note sounds");
+    p.setRegisterShift(2);host.position.setPpqPosition(first.start+.002);events.clear();p.processBlock(audio,events);
+    bool off=false,on=false;
+    for(const auto event:events) {
+        auto m=event.getMessage();if(m.isNoteOff()&&m.getNoteNumber()==first.pitch)off=true;
+        if(m.isNoteOn()){require(off,"old note released before shifted attack");require(m.getNoteNumber()==first.pitch+24,"playback uses shifted pitch");on=true;}
+    }
+    require(off&&on,"changing register releases and chases the held note");
+    const auto file=p.createMidiDragFile();auto input=file.createInputStream();juce::MidiFile midi;
+    require(input&&midi.readFrom(*input),"transposed MIDI export parses");int notes=0;
+    for(int i=0;i<midi.getTrack(0)->getNumEvents();++i){const auto& m=midi.getTrack(0)->getEventPointer(i)->message;if(m.isNoteOn()){require(m.getNoteNumber()==60,"export matches shifted playback");++notes;}}
+    require(notes==p.getPattern().count,"export retains all transposed notes");file.deleteFile();
+}
+
 void checkInputIsolation() {
     UndertowProcessor clean, fed;
     juce::MemoryBlock state; clean.getStateInformation(state);
@@ -81,6 +131,7 @@ int main(int argc, char* argv[]) {
     try {
         UndertowProcessor p;
         require(p.acceptsMidi() && p.producesMidi(), "Generator advertises Live-compatible MIDI input and output buses");
+        checkRegisterShift();
         checkInputIsolation();
         require(undertow::isValid(p.getPattern()), "Initial pattern must be valid");
         p.toggleLock(0);
